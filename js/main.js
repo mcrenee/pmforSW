@@ -1,3 +1,82 @@
+// ==========================================
+// Loading Screen
+// ==========================================
+window.addEventListener('load', () => {
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+        setTimeout(() => {
+            loadingScreen.classList.add('hidden');
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 500);
+        }, 800);
+    }
+});
+
+// ==========================================
+// Mobile Menu Toggle
+// ==========================================
+const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+const navLinks = document.getElementById('navLinks');
+
+if (mobileMenuToggle && navLinks) {
+    mobileMenuToggle.addEventListener('click', () => {
+        const isExpanded = mobileMenuToggle.getAttribute('aria-expanded') === 'true';
+        mobileMenuToggle.setAttribute('aria-expanded', !isExpanded);
+        navLinks.classList.toggle('active');
+    });
+    
+    // Close menu when clicking on a link
+    const navItems = navLinks.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            mobileMenuToggle.setAttribute('aria-expanded', 'false');
+            navLinks.classList.remove('active');
+        });
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!mobileMenuToggle.contains(e.target) && !navLinks.contains(e.target)) {
+            mobileMenuToggle.setAttribute('aria-expanded', 'false');
+            navLinks.classList.remove('active');
+        }
+    });
+}
+
+// ==========================================
+// Back to Top Button
+// ==========================================
+const backToTopBtn = document.getElementById('backToTop');
+
+if (backToTopBtn) {
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 500) {
+            backToTopBtn.classList.add('visible');
+        } else {
+            backToTopBtn.classList.remove('visible');
+        }
+    });
+    
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+    
+    // Keyboard support (Enter key)
+    backToTopBtn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+    });
+}
+
 // 平滑滚动
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
@@ -33,24 +112,34 @@ window.addEventListener('scroll', () => {
 // 创建电竞产业趋势图表 - 优化版
 function createEsportsChart() {
     const ctx = document.getElementById('esportsChart');
-    if (!ctx) return;
+    if (!ctx) {
+        console.warn('Chart canvas not found: esportsChart');
+        return;
+    }
 
-    const years = ['2020', '2021', '2022', '2023', '2024', '2025'];
-    const revenue = [238.5, 254.3, 267.8, 275.7, 283.9, 293.31];
-    const users = [4.44, 4.59, 4.72, 4.82, 4.89, 4.95];
+    // Check if Chart.js is loaded
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js library not loaded');
+        return;
+    }
 
-    // 创建渐变色
-    const revenueGradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 400);
-    revenueGradient.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
-    revenueGradient.addColorStop(0.5, 'rgba(99, 102, 241, 0.2)');
-    revenueGradient.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+    try {
+        const years = ['2020', '2021', '2022', '2023', '2024', '2025'];
+        const revenue = [238.5, 254.3, 267.8, 275.7, 283.9, 293.31];
+        const users = [4.44, 4.59, 4.72, 4.82, 4.89, 4.95];
 
-    const usersGradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 400);
-    usersGradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
-    usersGradient.addColorStop(0.5, 'rgba(16, 185, 129, 0.2)');
-    usersGradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+        // 创建渐变色
+        const revenueGradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 400);
+        revenueGradient.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
+        revenueGradient.addColorStop(0.5, 'rgba(99, 102, 241, 0.2)');
+        revenueGradient.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
 
-    new Chart(ctx, {
+        const usersGradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 400);
+        usersGradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
+        usersGradient.addColorStop(0.5, 'rgba(16, 185, 129, 0.2)');
+        usersGradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
+        new Chart(ctx, {
         type: 'line',
         data: {
             labels: years,
@@ -260,14 +349,27 @@ function createEsportsChart() {
             }
         }
     });
+    } catch (error) {
+        console.error('Error creating esports chart:', error);
+    }
 }
 
 // 创建投资成本分解图表 - 优化版（无图例）
 function createInvestmentChart() {
     const ctx = document.getElementById('investmentChart');
-    if (!ctx) return;
+    if (!ctx) {
+        console.warn('Chart canvas not found: investmentChart');
+        return;
+    }
 
-    const investmentData = {
+    // Check if Chart.js is loaded
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js library not loaded');
+        return;
+    }
+
+    try {
+        const investmentData = {
         labels: ['电竞设备投入', '加盟成本', '装修投入', '其他费用'],
         data: [35.64, 8.8, 5.88, 0.35],
         colors: [
@@ -402,51 +504,72 @@ function createInvestmentChart() {
             }
         }]
     });
+    } catch (error) {
+        console.error('Error creating investment chart:', error);
+    }
 }
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', () => {
-    createEsportsChart();
-    createInvestmentChart();
+    // Wait for Chart.js to load before creating charts
+    if (typeof Chart !== 'undefined') {
+        createEsportsChart();
+        createInvestmentChart();
+    } else {
+        console.warn('Chart.js not loaded yet, retrying...');
+        setTimeout(() => {
+            if (typeof Chart !== 'undefined') {
+                createEsportsChart();
+                createInvestmentChart();
+            } else {
+                console.error('Failed to load Chart.js library');
+            }
+        }, 1000);
+    }
+    
     createParticles();
     
-    // 添加加载动画
-    document.body.style.opacity = '0';
-    setTimeout(() => {
-        document.body.style.transition = 'opacity 0.5s ease';
-        document.body.style.opacity = '1';
-    }, 100);
+    // Initialize calculator
+    if (typeof calculate === 'function') {
+        calculate();
+    }
 });
 
 // 创建漂浮粒子效果
+// 创建闪烁的漂浮粒子效果
 function createParticles() {
     const particlesContainer = document.getElementById('particles');
-    if (!particlesContainer) return;
+    if (!particlesContainer) {
+        console.warn('Particles container not found');
+        return;
+    }
     
-    const particleCount = 50;
+    const particleCount = 60; // 增加粒子数量
     
     for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
         particle.className = 'particle';
         
-        // 随机大小
-        const size = Math.random() * 4 + 2;
+        // 随机大小 (2-5px)
+        const size = Math.random() * 3 + 2;
         particle.style.width = `${size}px`;
         particle.style.height = `${size}px`;
         
-        // 随机位置
+        // 随机水平位置
         particle.style.left = `${Math.random() * 100}%`;
         
-        // 随机动画时长
-        const duration = Math.random() * 10 + 10;
+        // 随机动画时长 (15-30秒)
+        const duration = Math.random() * 15 + 15;
         particle.style.animationDuration = `${duration}s`;
         
         // 随机延迟
-        const delay = Math.random() * 5;
+        const delay = Math.random() * 10;
         particle.style.animationDelay = `${delay}s`;
         
         particlesContainer.appendChild(particle);
     }
+    
+    console.log(`Created ${particleCount} twinkling particles`);
 }
 
 // 鼠标移动视差效果
