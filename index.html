@@ -133,31 +133,33 @@
                     <h3 class="result-title">投资回报分析</h3>
                     <div class="result-grid">
                         <div class="result-item">
-                            <div class="result-item-label">月均分成额</div>
+                            <div class="result-item-label">预计月分成金额（万元）</div>
                             <div class="result-item-value" id="monthlyShare">-</div>
                         </div>
                         <div class="result-item">
-                            <div class="result-item-label">回本周期</div>
-                            <div class="result-item-value highlight" id="paybackMonths">-</div>
+                            <div class="result-item-label">封顶金额（万元）</div>
+                            <div class="result-item-value highlight" id="cappedAmount">-</div>
                         </div>
                         <div class="result-item">
-                            <div class="result-item-label">预计联营期限</div>
-                            <div class="result-item-value" id="duration">-</div>
-                        </div>
-                        <div class="result-item">
-                            <div class="result-item-label">总收益预测</div>
-                            <div class="result-item-value highlight" id="totalReturn">-</div>
+                            <div class="result-item-label">预计联营期限（天）</div>
+                            <div class="result-item-value highlight" id="durationDays">-</div>
                         </div>
                     </div>
                     
                     <div class="calculation-logic">
                         <h4 class="logic-title">计算逻辑</h4>
                         <div class="logic-content">
-                            <p><strong>1. 月均分成额</strong> = 月营业额 × (分成比例 / 100)</p>
-                            <p><strong>2. 封顶金额</strong> = 投资金额 × (1 + 预期收益率 / 100)</p>
-                            <p><strong>3. 回本周期</strong> = 封顶金额 / 月均分成额（向上取整）</p>
-                            <p><strong>4. 预计联营期限</strong> = max(回本周期, 18个月)</p>
-                            <p><strong>5. 总收益预测</strong> = 月均分成额 × 预计联营期限</p>
+                            <p><strong>1. 预计联营期限（天）</strong></p>
+                            <p>投资金额 × (1 + 预期收益率/100/360×预计联营期限) = 月营业额 × 预计联营期限/30 × 分成比例/100</p>
+                            <p>求解得：预计联营期限 = 投资金额 / (月营业额 × 分成比例/3000 - 投资金额 × 预期收益率/36000)</p>
+                            
+                            <p class="mt-2"><strong>2. 预计月分成金额</strong> = 月营业额 × (分成比例 / 100)</p>
+                            
+                            <p class="mt-2"><strong>3. 封顶金额</strong> = 投资金额 × (1 + 预期收益率/100/360×预计联营期限)</p>
+                            
+                            <p class="mt-2 text-secondary" style="font-size: 0.85rem;">
+                                注：预期收益率按日息计算（年化/360天），精确到每天的收益累计
+                            </p>
                         </div>
                     </div>
                 </div>
