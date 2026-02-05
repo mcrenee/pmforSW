@@ -14,7 +14,24 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 初始化导航高亮
     initNavigation();
+    
+    // 初始化年份选择器
+    initYearSelector();
 });
+
+// 初始化年份选择器
+function initYearSelector() {
+    const yearSelect = document.getElementById('startYear');
+    const currentYear = new Date().getFullYear();
+    
+    // 生成从当前年份到未来10年的选项
+    for (let year = currentYear; year <= currentYear + 10; year++) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year + '年';
+        yearSelect.appendChild(option);
+    }
+}
 
 // ==========================================
 // 投资回报计算器
@@ -25,7 +42,8 @@ function calculateROI() {
     const monthlyRevenue = parseFloat(document.getElementById('monthlyRevenue').value);
     const shareRatio = parseFloat(document.getElementById('shareRatio').value);
     const annualRate = parseFloat(document.getElementById('annualRate').value);
-    const startDate = document.getElementById('startDate').value;
+    const startYear = document.getElementById('startYear').value;
+    const startMonth = document.getElementById('startMonth').value;
     
     if (!investAmount || !monthlyRevenue || !shareRatio || !annualRate) {
         alert('请填写所有必填信息');
@@ -37,8 +55,8 @@ function calculateROI() {
         return;
     }
     
-    if (!startDate) {
-        alert('请选择起投时间');
+    if (!startYear || !startMonth) {
+        alert('请选择起投时间（年份和月份）');
         return;
     }
     
@@ -66,6 +84,7 @@ function calculateROI() {
     const cappedAmount = I * (1 + (A / 100 / 360) * durationDays);
     
     // 3. 计算预计封顶时间
+    const startDate = `${startYear}-${startMonth}`;
     const start = new Date(startDate + '-01'); // 添加日期部分
     const end = new Date(start);
     end.setDate(end.getDate() + Math.ceil(durationDays));
