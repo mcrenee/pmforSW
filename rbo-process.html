@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>固定期限RBO处理流程 | 报数打款管理</title>
+    <meta name="description" content="固定期限RBO处理流程 - 浦东DRC、西安RBO、南京RBO项目报数打款管理系统">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            border-radius: 16px;
+            padding: 24px 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            color: #1a202c;
+            font-weight: 700;
+        }
+
+        .header-title .icon {
+            font-size: 32px;
+            color: #667eea;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Project Tabs */
+        .project-tabs {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            flex: 1;
+            min-width: 200px;
+            padding: 16px 24px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .tab-button:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Flow Chart Container */
+        .flow-chart-container {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            position: relative;
+            min-height: 600px;
+        }
+
+        .flow-chart {
+            position: relative;
+            overflow-x: auto;
+            overflow-y: visible;
+            padding: 40px 20px;
+        }
+
+        /* Process Node Styles */
+        .process-node {
+            position: relative;
+            display: inline-block;
+            padding: 20px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 0 20px;
+            min-width: 180px;
+        }
+
+        .process-node:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Executor Colors */
+        .executor-siwa {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .executor-mc {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .time-node {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            font-weight: 700;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            z-index: 1000;
+            min-width: 300px;
+            max-width: 500px;
+            display: none;
+            border: 2px solid #667eea;
+        }
+
+        .tooltip.show {
+            display: block;
+        }
+
+        .tooltip-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .tooltip-content {
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .tooltip-section {
+            margin-bottom: 12px;
+        }
+
+        .tooltip-section strong {
+            display: block;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+
+        .tooltip-link {
+            color: #667eea;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .tooltip-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Flow Layout */
+        .flow-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .flow-parallel {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .arrow {
+            font-size: 24px;
+            color: #cbd5e0;
+            margin: 0 20px;
+        }
+
+        .arrow-down {
+            font-size: 24px;
+            color: #cbd5e0;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #4a5568;
+        }
+
+        .legend-color {
+            width: 40px;
+            height: 24px;
+            border-radius: 6px;
+        }
+
+        /* Zoom Controls */
+        .zoom-controls {
+            position: absolute;
+            top: 32px;
+            right: 32px;
+            display: flex;
+            gap: 8px;
+            background: white;
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .zoom-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #f7fafc;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            color: #4a5568;
+            transition: all 0.2s;
+        }
+
+        .zoom-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Project Display None */
+        .project-content {
+            display: none;
+        }
+
+        .project-content.active {
+            display: block;
+        }
+
+        /* Stage Labels */
+        .stage-label {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d3748;
+            margin: 40px 0 20px 0;
+            padding: 12px;
+            background: #f7fafc;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-title">
+                <i class="fas fa-project-diagram icon"></i>
+                <h1>固定期限RBO处理流程</h1>
+            </div>
+            <a href="index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                返回投资平台
+            </a>
+        </header>
+
+        <!-- Project Tabs -->
+        <div class="project-tabs">
+            <button class="tab-button active" data-project="pudong">
+                <i class="fas fa-building"></i> 浦东DRC项目
+            </button>
+            <button class="tab-button" data-project="xian-nanjing">
+                <i class="fas fa-city"></i> 西安RBO & 南京RBO项目
+            </button>
+        </div>
+
+        <!-- Flow Chart Container -->
+        <div class="flow-chart-container">
+            <!-- Zoom Controls -->
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="zoomIn()">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="zoom-btn" onclick="zoomOut()">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="zoom-btn" onclick="resetZoom()">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>
+                    <span>时间节点</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                    <span>肆瓦执行</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
+                    <span>MC执行</span>
+                </div>
+            </div>
+
+            <!-- Pudong DRC Project Flow -->
+            <div id="pudong-flow" class="project-content active">
+                <div class="flow-chart" id="pudong-chart">
+                    <div class="flow-row">
+                        <div class="process-node time-node" data-tooltip="time-pudong">
+                            <div>⏰ 每月1号或15号</div>
+                        </div>
+                    </div>
+
+                    <div class="arrow-down">⬇</div>
+
+                    <div class="flow-row">
+                        <div class="flow-parallel">
+                            <div style="display: flex; align-items: center;">
+                                <div class="process-node executor-siwa" data-tooltip="siwa-email">
+                                    <div>📧 肆瓦：邮件报数</div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center;">
+                                <div class="process-node executor-mc" data-tooltip="mc-upload">
+                                    <div>📤 MC：运营平台上传Excel</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="arrow-down">⬇</div>
+
+                    <div class="flow-row">
+                        <div class="process-node executor-mc" data-tooltip="mc-deduction">
+                            <div>💳 MC：自动扣款</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Xian & Nanjing RBO Project Flow -->
+            <div id="xian-nanjing-flow" class="project-content">
+                <div class="flow-chart" id="xian-nanjing-chart">
+                    <!-- Stage 1 -->
+                    <div class="stage-label">
+                        <i class="fas fa-calendar-day"></i> 第一阶段：每月1号或15号（报数环节）
+                    </div>
+
+                    <div class="flow-row">
+                        <div class="process-node time-node" data-tooltip="time-stage1">
+                            <div>⏰ 每月1号或15号</div>
+                        </div>
+                    </div>
+
+                    <div class="arrow-down">⬇</div>
+
+                    <div class="flow-row">
+                        <div class="flow-parallel">
+                            <div style="display: flex; align-items: center;">
+                                <div class="process-node executor-siwa" data-tooltip="siwa-email-xn">
+                                    <div>📧 肆瓦：邮件报数</div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center;">
+                                <div class="process-node executor-mc" data-tooltip="mc-oa-report">
+                                    <div>📋 MC：提报OA</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="arrow-down">⬇</div>
+
+                    <!-- Stage 2 -->
+                    <div class="stage-label">
+                        <i class="fas fa-calendar-check"></i> 第二阶段：每月2号或16号（凭证报送 + OA提报）
+                    </div>
+
+                    <div class="flow-row">
+                        <div class="process-node time-node" data-tooltip="time-stage2">
+                            <div>⏰ 每月2号或16号</div>
+                        </div>
+                    </div>
+
+                    <div class="arrow-down">⬇</div>
+
+                    <div class="flow-row">
+                        <div class="flow-parallel">
+                            <div style="display: flex; align-items: center;">
+                                <div class="process-node executor-siwa" data-tooltip="siwa-voucher">
+                                    <div>📄 肆瓦：邮件报送打款凭证</div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center;">
+                                <div class="process-node executor-mc" data-tooltip="mc-oa-voucher">
+                                    <div>📋 MC：提报OA（打款材料）</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="arrow-down">⬇</div>
+
+                    <div class="flow-row">
+                        <div class="process-node" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
+                            <div>✅ 流程完成</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tooltip -->
+    <div id="tooltip" class="tooltip"></div>
+
+    <script>
+        // Tooltip data
+        const tooltipData = {
+            // Pudong DRC
+            'time-pudong': {
+                title: '⏰ 时间节点：每月1号或15号',
+                content: `
+                    <div class="tooltip-section">
+                        <strong>关键时间：</strong>
+                        每月1号或15号是浦东DRC项目的核心报数时间节点
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>执行要求：</strong>
+                        肆瓦和MC需在当天完成各自的报数任务
+                    </div>
+                `
+            },
+            'siwa-email': {
+                title: '📧 肆瓦：邮件报数',
+                content: `
+                    <div class="tooltip-section">
+                        <strong>执行方：</strong>肆瓦
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>核心动作：</strong>通过邮件报送收入数据
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>邮件模板要素：</strong>
+                        <ul style="margin: 8px 0; padding-left: 20px;">
+                            <li>发件人：上海肆瓦发起人对应邮箱</li>
+                            <li>收件人：am@mcex.mo; accounting_service@mcex.mo</li>
+                            <li>抄送人：zhangyi@microconnect.com; reneexu@microconnect.com; peilan@liantu.com.cn</li>
+                        </ul>
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>邮件正文要求：</strong>
+                        需填写期间企业整体实收金额汇总、RBO编码，且需按RBC约定分成比例复核确认实收金额与付款金额
+                    </div>
+                `
+            },
+            'mc-upload': {
+                title: '📤 MC：运营平台上传Excel',
+                content: `
+                    <div class="tooltip-section">
+                        <strong>执行方：</strong>MC
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>核心动作：</strong>在MC运营平台上传Excel文件完成报数
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>平台地址：</strong>
+                        <a href="https://mcisaas.mcc-cido/revenue-upload#/hand-upload" target="_blank" class="tooltip-link">
+                            https://mcisaas.mcc-cido/revenue-upload#/hand-upload
+                        </a>
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>⚠️ 关键规则：</strong>
+                        <ul style="margin: 8px 0; padding-left: 20px;">
+                            <li>当日中午12点前上传 → 当日下午6点自动扣款</li>
+                            <li>超过12点上传 → 下一自然日完成扣款</li>
+                        </ul>
+                    </div>
+                `
+            },
+            'mc-deduction': {
+                title: '💳 MC：自动扣款',
+                content: `
+                    <div class="tooltip-section">
+                        <strong>执行方：</strong>MC系统自动执行
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>扣款时间：</strong>
+                        <ul style="margin: 8px 0; padding-left: 20px;">
+                            <li>12点前上传：当日下午6点扣款</li>
+                            <li>12点后上传：下一自然日扣款</li>
+                        </ul>
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>注意事项：</strong>
+                        扣款金额需与报数邮件中的付款金额一致
+                    </div>
+                `
+            },
+
+            // Xian & Nanjing RBO
+            'time-stage1': {
+                title: '⏰ 第一阶段时间节点',
+                content: `
+                    <div class="tooltip-section">
+                        <strong>时间：</strong>每月1号或15号
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>阶段任务：</strong>报数环节
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>执行要求：</strong>肆瓦和MC需在当天完成报数相关工作
+                    </div>
+                `
+            },
+            'siwa-email-xn': {
+                title: '📧 肆瓦：邮件报数',
+                content: `
+                    <div class="tooltip-section">
+                        <strong>执行方：</strong>肆瓦
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>核心动作：</strong>通过邮件报送收入数据
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>邮件模板要素：</strong>
+                        <ul style="margin: 8px 0; padding-left: 20px;">
+                            <li>发件人：上海肆瓦发起人对应邮箱</li>
+                            <li>收件人：am@mcex.mo; accounting_service@mcex.mo</li>
+                            <li>抄送人：zhangyi@microconnect.com; reneexu@microconnect.com; peilan@liantu.com.cn</li>
+                        </ul>
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>邮件正文要求：</strong>
+                        需填写时间范围、RBO编码、金额复核要求等
+                    </div>
+                `
+            },
+            'mc-oa-report': {
+                title: '📋 MC：提报OA',
+                content: `
+                    <div class="tooltip-section">
+                        <strong>执行方：</strong>MC
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>核心动作：</strong>在OA系统提报报数相关材料
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>关键输出：</strong>
+                        OA上上传报数邮件截图（需包含报数数据）
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>参考模板：</strong>
+                        IT06 - 数据修改申请 - Wang Yuezi (Artemis)-2025-12-15.pdf
+                    </div>
+                `
+            },
+            'time-stage2': {
+                title: '⏰ 第二阶段时间节点',
+                content: `
+                    <div class="tooltip-section">
+                        <strong>时间：</strong>每月2号或16号
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>阶段任务：</strong>凭证报送 + OA提报环节
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>执行要求：</strong>肆瓦和MC需在当天完成打款凭证相关工作
+                    </div>
+                `
+            },
+            'siwa-voucher': {
+                title: '📄 肆瓦：邮件报送打款凭证',
+                content: `
+                    <div class="tooltip-section">
+                        <strong>执行方：</strong>肆瓦
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>核心动作：</strong>通过邮件报送打款凭证
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>邮件模板要素：</strong>
+                        <ul style="margin: 8px 0; padding-left: 20px;">
+                            <li>发件人：上海肆瓦发起人对应邮箱</li>
+                            <li>收件人：am@mcex.mo; accounting_service@mcex.mo</li>
+                            <li>抄送人：zhangyi@microconnect.com; reneexu@microconnect.com; peilan@liantu.com.cn</li>
+                        </ul>
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>邮件正文要求：</strong>
+                        需填写期间企业应支付的收入分成金额，说明已支付至指定账户，打款记录及打款凭证已附在附件中
+                    </div>
+                `
+            },
+            'mc-oa-voucher': {
+                title: '📋 MC：提报OA（打款材料）',
+                content: `
+                    <div class="tooltip-section">
+                        <strong>执行方：</strong>MC
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>核心动作：</strong>在OA系统提报打款相关材料
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>关键输出：</strong>
+                        OA上上传打款邮件与打款凭证文件
+                    </div>
+                    <div class="tooltip-section">
+                        <strong>参考模板：</strong>
+                        IT06 - 数据修改申请 - Li Hao (Ben)-2026-01-22.pdf
+                    </div>
+                `
+            }
+        };
+
+        // Zoom functionality
+        let currentZoom = 1;
+        const zoomStep = 0.1;
+        const minZoom = 0.5;
+        const maxZoom = 2;
+
+        function zoomIn() {
+            if (currentZoom < maxZoom) {
+                currentZoom += zoomStep;
+                applyZoom();
+            }
+        }
+
+        function zoomOut() {
+            if (currentZoom > minZoom) {
+                currentZoom -= zoomStep;
+                applyZoom();
+            }
+        }
+
+        function resetZoom() {
+            currentZoom = 1;
+            applyZoom();
+        }
+
+        function applyZoom() {
+            const activeChart = document.querySelector('.project-content.active .flow-chart');
+            if (activeChart) {
+                activeChart.style.transform = `scale(${currentZoom})`;
+                activeChart.style.transformOrigin = 'top center';
+            }
+        }
+
+        // Tab switching
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                this.classList.add('active');
+
+                // Hide all project contents
+                document.querySelectorAll('.project-content').forEach(content => content.classList.remove('active'));
+
+                // Show selected project content
+                const project = this.dataset.project;
+                if (project === 'pudong') {
+                    document.getElementById('pudong-flow').classList.add('active');
+                } else {
+                    document.getElementById('xian-nanjing-flow').classList.add('active');
+                }
+
+                // Reset zoom
+                resetZoom();
+            });
+        });
+
+        // Tooltip functionality
+        const tooltip = document.getElementById('tooltip');
+        let currentTooltip = null;
+
+        document.querySelectorAll('.process-node').forEach(node => {
+            node.addEventListener('mouseenter', function(e) {
+                const tooltipId = this.dataset.tooltip;
+                if (tooltipId && tooltipData[tooltipId]) {
+                    const data = tooltipData[tooltipId];
+                    tooltip.innerHTML = `
+                        <div class="tooltip-title">${data.title}</div>
+                        <div class="tooltip-content">${data.content}</div>
+                    `;
+
+                    // Position tooltip
+                    const rect = this.getBoundingClientRect();
+                    const tooltipRect = tooltip.getBoundingClientRect();
+                    
+                    let left = rect.left + (rect.width / 2) - 150;
+                    let top = rect.bottom + 10;
+
+                    // Adjust if tooltip goes off screen
+                    if (left < 10) left = 10;
+                    if (left + 300 > window.innerWidth) left = window.innerWidth - 310;
+                    if (top + 200 > window.innerHeight) top = rect.top - 210;
+
+                    tooltip.style.left = left + 'px';
+                    tooltip.style.top = top + 'px';
+                    tooltip.classList.add('show');
+                    currentTooltip = this;
+                }
+            });
+
+            node.addEventListener('mouseleave', function() {
+                setTimeout(() => {
+                    if (currentTooltip === this) {
+                        tooltip.classList.remove('show');
+                        currentTooltip = null;
+                    }
+                }, 100);
+            });
+        });
+
+        // Hide tooltip when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.process-node') && !e.target.closest('.tooltip')) {
+                tooltip.classList.remove('show');
+                currentTooltip = null;
+            }
+        });
+    </script>
+</body>
+</html>
