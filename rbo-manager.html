@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RBO登记管理器 | 报数打款登记系统</title>
+    <meta name="description" content="RBO登记管理器 - 固定期限RBO处理流程登记与管理系统">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            border-radius: 16px;
+            padding: 24px 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            color: #1a202c;
+            font-weight: 700;
+        }
+
+        .header-title .icon {
+            font-size: 32px;
+            color: #667eea;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+
+        .control-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .control-group input,
+        .control-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .control-group input:focus,
+        .control-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            color: #48bb78;
+            margin-top: 4px;
+        }
+
+        /* Table Container */
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .table-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        /* Data Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 13px;
+            color: #4a5568;
+        }
+
+        .data-table tr:hover {
+            background-color: #f7fafc;
+        }
+
+        .data-table input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .data-table input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .data-table select {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-completed {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-pending {
+            background: #feebc8;
+            color: #744210;
+        }
+
+        .status-processing {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        /* Action Buttons */
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .action-btn-edit {
+            background: #667eea;
+            color: white;
+        }
+
+        .action-btn-delete {
+            background: #fc8181;
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #a0aec0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #2d3748;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a0aec0;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state p {
+            font-size: 18px;
+            margin-bottom: 24px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .control-row {
+                flex-direction: column;
+            }
+
+            .table-container {
+                padding: 16px;
+            }
+
+            .modal-content {
+                padding: 24px 16px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-title">
+                <i class="fas fa-clipboard-list icon"></i>
+                <h1>RBO登记管理器</h1>
+            </div>
+            <div class="header-actions">
+                <a href="rbo-process.html" class="btn btn-secondary">
+                    <i class="fas fa-project-diagram"></i>
+                    查看流程图
+                </a>
+                <a href="index.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    返回主页
+                </a>
+            </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">总记录数</div>
+                <div class="stat-value" id="total-count">0</div>
+                <div class="stat-change">所有RBO记录</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">已完成</div>
+                <div class="stat-value" id="completed-count">0</div>
+                <div class="stat-change">流程已完成</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">处理中</div>
+                <div class="stat-value" id="processing-count">0</div>
+                <div class="stat-change">正在处理</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">总打款金额</div>
+                <div class="stat-value" id="total-amount">¥0</div>
+                <div class="stat-change">实际打款总额</div>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="control-row">
+                <div class="control-group">
+                    <label>
+                        <i class="fas fa-search"></i> 搜索RBO编码或简称
+                    </label>
+                    <input type="text" id="search-input" placeholder="输入RBO编码或项目简称搜索...">
+                </div>
+                <div class="control-group">
+                    <label>
+                        <i class="fas fa-filter"></i> 状态筛选
+                    </label>
+                    <select id="status-filter">
+                        <option value="">全部状态</option>
+                        <option value="已完成">已完成</option>
+                        <option value="处理中">处理中</option>
+                        <option value="待处理">待处理</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>
+                        <i class="fas fa-calendar"></i> 日期范围
+                    </label>
+                    <input type="date" id="date-filter">
+                </div>
+                <div class="control-group" style="display: flex; align-items: flex-end;">
+                    <button class="btn btn-primary" onclick="addRecord()">
+                        <i class="fas fa-plus"></i>
+                        新增记录
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-title">
+                    <i class="fas fa-table"></i> RBO登记记录
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="exportToExcel()">
+                        <i class="fas fa-file-excel"></i>
+                        导出Excel
+                    </button>
+                    <button class="btn btn-secondary" onclick="importFromExcel()">
+                        <i class="fas fa-file-upload"></i>
+                        导入Excel
+                    </button>
+                    <input type="file" id="import-file" accept=".xlsx,.xls" style="display: none;" onchange="handleFileImport(event)">
+                </div>
+            </div>
+
+            <div id="table-content">
+                <!-- Table will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="record-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">新增RBO记录</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+
+            <form id="record-form" onsubmit="saveRecord(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>处理日期 *</label>
+                        <input type="date" name="processDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>状态 *</label>
+                        <select name="status" required>
+                            <option value="">请选择</option>
+                            <option value="已完成">已完成</option>
+                            <option value="处理中">处理中</option>
+                            <option value="待处理">待处理</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>系统 *</label>
+                        <input type="text" name="system" placeholder="如：二合一" required>
+                    </div>
+                    <div class="form-group">
+                        <label>RBO编码 *</label>
+                        <input type="text" name="rboCode" placeholder="如：RT-CN0100-PAWSV0001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>内部RBO编码 *</label>
+                        <input type="text" name="internalCode" placeholder="如：R0000000003" required>
+                    </div>
+                    <div class="form-group">
+                        <label>简称 *</label>
+                        <input type="text" name="shortName" placeholder="如：上海肆瓦南京机场（二合一）" required>
+                    </div>
+                    <div class="form-group">
+                        <label>对应分成周期开始日 *</label>
+                        <input type="date" name="periodStart" required>
+                    </div>
+                    <div class="form-group">
+                        <label>对应分成周期结束日 *</label>
+                        <input type="date" name="periodEnd" required>
+                    </div>
+                    <div class="form-group">
+                        <label>信息流OA</label>
+                        <input type="text" name="infoOA" placeholder="如：IT06-20250801001">
+                    </div>
+                    <div class="form-group">
+                        <label>信息流处理日期</label>
+                        <input type="date" name="infoDate">
+                    </div>
+                    <div class="form-group">
+                        <label>应打款金额 *</label>
+                        <input type="number" step="0.01" name="expectedAmount" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>实际打款金额 *</label>
+                        <input type="number" step="0.01" name="actualAmount" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>资金流OA单</label>
+                        <input type="text" name="fundOA" placeholder="如：/表示无">
+                    </div>
+                    <div class="form-group">
+                        <label>资金流处理日期</label>
+                        <input type="date" name="fundDate">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">
+                        <i class="fas fa-times"></i>
+                        取消
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let records = [];
+        let editingIndex = -1;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            renderTable();
+            updateStats();
+
+            // Search functionality
+            document.getElementById('search-input').addEventListener('input', filterTable);
+            document.getElementById('status-filter').addEventListener('change', filterTable);
+            document.getElementById('date-filter').addEventListener('change', filterTable);
+        });
+
+        // Load data from localStorage
+        function loadData() {
+            const savedData = localStorage.getItem('rbo_records');
+            if (savedData) {
+                records = JSON.parse(savedData);
+            } else {
+                // Sample data
+                records = [
+                    {
+                        processDate: '2025-08-06',
+                        status: '已完成',
+                        system: '二合一',
+                        rboCode: 'RT-CN0100-PAWSV0001',
+                        internalCode: 'R0000000003',
+                        shortName: '上海肆瓦南京机场（二合一）',
+                        periodStart: '2025-07-30',
+                        periodEnd: '2025-07-31',
+                        infoOA: 'IT06-20250801001',
+                        infoDate: '2025-08-06',
+                        expectedAmount: '0.00',
+                        actualAmount: '0.00',
+                        fundOA: '/',
+                        fundDate: '2025-08-06'
+                    }
+                ];
+                saveData();
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('rbo_records', JSON.stringify(records));
+        }
+
+        // Render table
+        function renderTable(filteredRecords = null) {
+            const dataToRender = filteredRecords || records;
+            const tableContent = document.getElementById('table-content');
+
+            if (dataToRender.length === 0) {
+                tableContent.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>暂无记录</p>
+                        <button class="btn btn-primary" onclick="addRecord()">
+                            <i class="fas fa-plus"></i>
+                            添加第一条记录
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            let tableHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>处理日期</th>
+                            <th>状态</th>
+                            <th>系统</th>
+                            <th>RBO编码</th>
+                            <th>内部RBO编码</th>
+                            <th>简称</th>
+                            <th>分成周期开始</th>
+                            <th>分成周期结束</th>
+                            <th>信息流OA</th>
+                            <th>信息流处理日期</th>
+                            <th>应打款金额</th>
+                            <th>实际打款金额</th>
+                            <th>资金流OA单</th>
+                            <th>资金流处理日期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            dataToRender.forEach((record, index) => {
+                const statusClass = record.status === '已完成' ? 'status-completed' : 
+                                  record.status === '处理中' ? 'status-processing' : 
+                                  'status-pending';
+
+                tableHTML += `
+                    <tr>
+                        <td>${record.processDate}</td>
+                        <td><span class="status-badge ${statusClass}">${record.status}</span></td>
+                        <td>${record.system}</td>
+                        <td>${record.rboCode}</td>
+                        <td>${record.internalCode}</td>
+                        <td>${record.shortName}</td>
+                        <td>${record.periodStart}</td>
+                        <td>${record.periodEnd}</td>
+                        <td>${record.infoOA || '-'}</td>
+                        <td>${record.infoDate || '-'}</td>
+                        <td>¥${parseFloat(record.expectedAmount).toFixed(2)}</td>
+                        <td>¥${parseFloat(record.actualAmount).toFixed(2)}</td>
+                        <td>${record.fundOA || '-'}</td>
+                        <td>${record.fundDate || '-'}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn action-btn-edit" onclick="editRecord(${index})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn action-btn-delete" onclick="deleteRecord(${index})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            tableContent.innerHTML = tableHTML;
+        }
+
+        // Update statistics
+        function updateStats() {
+            const totalCount = records.length;
+            const completedCount = records.filter(r => r.status === '已完成').length;
+            const processingCount = records.filter(r => r.status === '处理中').length;
+            const totalAmount = records.reduce((sum, r) => sum + parseFloat(r.actualAmount || 0), 0);
+
+            document.getElementById('total-count').textContent = totalCount;
+            document.getElementById('completed-count').textContent = completedCount;
+            document.getElementById('processing-count').textContent = processingCount;
+            document.getElementById('total-amount').textContent = `¥${totalAmount.toFixed(2)}`;
+        }
+
+        // Filter table
+        function filterTable() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const statusFilter = document.getElementById('status-filter').value;
+            const dateFilter = document.getElementById('date-filter').value;
+
+            let filtered = records;
+
+            if (searchTerm) {
+                filtered = filtered.filter(r => 
+                    r.rboCode.toLowerCase().includes(searchTerm) ||
+                    r.shortName.toLowerCase().includes(searchTerm) ||
+                    r.internalCode.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            if (statusFilter) {
+                filtered = filtered.filter(r => r.status === statusFilter);
+            }
+
+            if (dateFilter) {
+                filtered = filtered.filter(r => r.processDate === dateFilter);
+            }
+
+            renderTable(filtered);
+        }
+
+        // Add record
+        function addRecord() {
+            editingIndex = -1;
+            document.getElementById('modal-title').textContent = '新增RBO记录';
+            document.getElementById('record-form').reset();
+            document.getElementById('record-modal').classList.add('show');
+        }
+
+        // Edit record
+        function editRecord(index) {
+            editingIndex = index;
+            const record = records[index];
+            
+            document.getElementById('modal-title').textContent = '编辑RBO记录';
+            const form = document.getElementById('record-form');
+            
+            form.elements['processDate'].value = record.processDate;
+            form.elements['status'].value = record.status;
+            form.elements['system'].value = record.system;
+            form.elements['rboCode'].value = record.rboCode;
+            form.elements['internalCode'].value = record.internalCode;
+            form.elements['shortName'].value = record.shortName;
+            form.elements['periodStart'].value = record.periodStart;
+            form.elements['periodEnd'].value = record.periodEnd;
+            form.elements['infoOA'].value = record.infoOA || '';
+            form.elements['infoDate'].value = record.infoDate || '';
+            form.elements['expectedAmount'].value = record.expectedAmount;
+            form.elements['actualAmount'].value = record.actualAmount;
+            form.elements['fundOA'].value = record.fundOA || '';
+            form.elements['fundDate'].value = record.fundDate || '';
+
+            document.getElementById('record-modal').classList.add('show');
+        }
+
+        // Delete record
+        function deleteRecord(index) {
+            if (confirm('确定要删除这条记录吗？')) {
+                records.splice(index, 1);
+                saveData();
+                renderTable();
+                updateStats();
+            }
+        }
+
+        // Save record
+        function saveRecord(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            const record = {
+                processDate: formData.get('processDate'),
+                status: formData.get('status'),
+                system: formData.get('system'),
+                rboCode: formData.get('rboCode'),
+                internalCode: formData.get('internalCode'),
+                shortName: formData.get('shortName'),
+                periodStart: formData.get('periodStart'),
+                periodEnd: formData.get('periodEnd'),
+                infoOA: formData.get('infoOA'),
+                infoDate: formData.get('infoDate'),
+                expectedAmount: formData.get('expectedAmount'),
+                actualAmount: formData.get('actualAmount'),
+                fundOA: formData.get('fundOA'),
+                fundDate: formData.get('fundDate')
+            };
+
+            if (editingIndex >= 0) {
+                records[editingIndex] = record;
+            } else {
+                records.unshift(record);
+            }
+
+            saveData();
+            closeModal();
+            renderTable();
+            updateStats();
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('record-modal').classList.remove('show');
+            document.getElementById('record-form').reset();
+            editingIndex = -1;
+        }
+
+        // Export to Excel
+        function exportToExcel() {
+            const data = records.map(r => ({
+                '处理日期': r.processDate,
+                '状态': r.status,
+                '系统': r.system,
+                'RBO编码': r.rboCode,
+                '内部RBO编码': r.internalCode,
+                '简称': r.shortName,
+                '对应分成周期开始日': r.periodStart,
+                '对应分成周期结束日': r.periodEnd,
+                '信息流OA': r.infoOA,
+                '信息流处理日期': r.infoDate,
+                '应打款金额': `¥${parseFloat(r.expectedAmount).toFixed(2)}`,
+                '实际打款金额': `¥${parseFloat(r.actualAmount).toFixed(2)}`,
+                '资金流OA单': r.fundOA,
+                '资金流处理日期': r.fundDate
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'RBO记录');
+            
+            const fileName = `RBO登记记录_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+        }
+
+        // Import from Excel trigger
+        function importFromExcel() {
+            document.getElementById('import-file').click();
+        }
+
+        // Handle file import
+        function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+                    // Convert imported data to our format
+                    const importedRecords = jsonData.map(row => ({
+                        processDate: row['处理日期'] || '',
+                        status: row['状态'] || '待处理',
+                        system: row['系统'] || '',
+                        rboCode: row['RBO编码'] || '',
+                        internalCode: row['内部RBO编码'] || '',
+                        shortName: row['简称'] || '',
+                        periodStart: row['对应分成周期开始日'] || '',
+                        periodEnd: row['对应分成周期结束日'] || '',
+                        infoOA: row['信息流OA'] || '',
+                        infoDate: row['信息流处理日期'] || '',
+                        expectedAmount: (row['应打款金额'] || '0').toString().replace(/[¥,]/g, ''),
+                        actualAmount: (row['实际打款金额'] || '0').toString().replace(/[¥,]/g, ''),
+                        fundOA: row['资金流OA单'] || '',
+                        fundDate: row['资金流处理日期'] || ''
+                    }));
+
+                    if (confirm(`将导入 ${importedRecords.length} 条记录，是否继续？`)) {
+                        records = [...importedRecords, ...records];
+                        saveData();
+                        renderTable();
+                        updateStats();
+                        alert('导入成功！');
+                    }
+                } catch (error) {
+                    alert('导入失败：' + error.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            
+            // Reset file input
+            event.target.value = '';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('record-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
