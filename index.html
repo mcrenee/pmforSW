@@ -3,484 +3,393 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>滴灌投资决策平台 | 超级加盟商投资分析</title>
-    <meta name="description" content="滴灌投资决策平台 - 专业的超级加盟商投资分析工具，提供投资回报计算、企业筛选评估和协议设计服务">
+    <title>RBO管理系统 | 报数打款管理平台</title>
+    <meta name="description" content="RBO管理系统 - 固定期限RBO处理流程与登记管理平台">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 20px;
+            opacity: 0.95;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .card-icon {
+            font-size: 64px;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 16px;
+        }
+
+        .card-description {
+            font-size: 16px;
+            color: #718096;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .card-features {
+            list-style: none;
+            text-align: left;
+            margin-bottom: 24px;
+        }
+
+        .card-features li {
+            padding: 8px 0;
+            color: #4a5568;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-features li i {
+            color: #667eea;
+            font-size: 16px;
+        }
+
+        .card-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .card:hover .card-button {
+            transform: scale(1.05);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            animation: fadeIn 1s ease-out 0.5s both;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .footer-link:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .footer-copyright {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 36px;
+            }
+
+            .header p {
+                font-size: 16px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 30px;
+            }
+
+            .card-icon {
+                font-size: 48px;
+            }
+
+            .card-title {
+                font-size: 24px;
+            }
+        }
+
+        /* Info Banner */
+        .info-banner {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            animation: fadeIn 0.8s ease-out 0.3s both;
+        }
+
+        .info-banner h3 {
+            color: #2d3748;
+            font-size: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-banner h3 i {
+            color: #667eea;
+        }
+
+        .info-banner p {
+            color: #4a5568;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .projects-list {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .project-tag {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="container">
-            <nav>
-                <a href="#" class="brand">滴灌投资</a>
-                <ul class="nav-menu">
-                    <li><a href="#overview" class="active">行业概览</a></li>
-                    <li><a href="#calculator">投资计算器</a></li>
-                    <li><a href="#screening">行业筛子</a></li>
-                    <li><a href="#contract">协议设计</a></li>
-                    <li><a href="rbo-manager.html">RBO管理器</a></li>
-                    <li><a href="rbo-process.html">流程图</a></li>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-chart-line"></i> RBO管理系统</h1>
+            <p>固定期限RBO处理流程与登记管理平台</p>
+        </div>
+
+        <!-- Info Banner -->
+        <div class="info-banner">
+            <h3>
+                <i class="fas fa-info-circle"></i>
+                支持项目
+            </h3>
+            <p>本系统支持以下RBO项目的流程管理和数据登记：</p>
+            <div class="projects-list">
+                <span class="project-tag">浦东DRC项目</span>
+                <span class="project-tag">西安RBO项目</span>
+                <span class="project-tag">南京RBO项目</span>
+            </div>
+        </div>
+
+        <!-- Cards Grid -->
+        <div class="cards-grid">
+            <!-- RBO Manager Card -->
+            <a href="rbo-manager.html" class="card">
+                <div class="card-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <h2 class="card-title">RBO登记管理器</h2>
+                <p class="card-description">
+                    完整的报数打款登记与追踪系统，管理所有RBO处理记录
+                </p>
+                <ul class="card-features">
+                    <li><i class="fas fa-check-circle"></i> 14个关键字段全覆盖</li>
+                    <li><i class="fas fa-search"></i> 智能搜索和多维筛选</li>
+                    <li><i class="fas fa-chart-bar"></i> 实时统计与数据分析</li>
+                    <li><i class="fas fa-file-excel"></i> Excel导入导出功能</li>
+                    <li><i class="fas fa-database"></i> 本地数据持久化存储</li>
                 </ul>
-            </nav>
+                <div class="card-button">
+                    进入管理器
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <!-- RBO Process Card -->
+            <a href="rbo-process.html" class="card">
+                <div class="card-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h2 class="card-title">RBO流程图</h2>
+                <p class="card-description">
+                    交互式流程图展示固定期限RBO处理流程，清晰了解操作步骤
+                </p>
+                <ul class="card-features">
+                    <li><i class="fas fa-exchange-alt"></i> 项目模块快速切换</li>
+                    <li><i class="fas fa-clock"></i> 关键时间节点标注</li>
+                    <li><i class="fas fa-users"></i> 执行方分工清晰</li>
+                    <li><i class="fas fa-envelope"></i> 完整邮件模板展示</li>
+                    <li><i class="fas fa-search-plus"></i> 支持缩放拖拽查看</li>
+                </ul>
+                <div class="card-button">
+                    查看流程图
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
         </div>
-    </header>
 
-    <!-- Main Content -->
-    <main>
-        <div class="container">
-            
-            <!-- Industry Overview -->
-            <section id="overview" class="section">
-                <h2 class="section-title">超级加盟商行业概览</h2>
-                <p class="section-description">2025年中国连锁加盟市场持续增长，呈现专业化、规模化发展趋势</p>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value">2.77万亿</div>
-                        <div class="stat-label">2025年市场规模（元）</div>
-                        <div class="stat-change">+4.8% YoY</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">160万+</div>
-                        <div class="stat-label">2024年新开门店</div>
-                        <div class="stat-change">+26.4% YoY</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">49%</div>
-                        <div class="stat-label">餐饮连锁化率</div>
-                        <div class="stat-change">持续提升</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">15%+</div>
-                        <div class="stat-label">年复合增长率</div>
-                        <div class="stat-change">高速增长</div>
-                    </div>
-                </div>
-                
-                <div class="card mt-3">
-                    <h3 class="card-title">核心增长动力</h3>
-                    <div class="growth-drivers">
-                        <div class="driver-item">
-                            <div class="driver-number">01</div>
-                            <div class="driver-content">
-                                <h4>消费升级驱动</h4>
-                                <p>中产阶级扩大，对品质生活需求增加，推动品牌连锁发展</p>
-                            </div>
-                        </div>
-                        <div class="driver-item">
-                            <div class="driver-number">02</div>
-                            <div class="driver-content">
-                                <h4>高势能点位稀缺</h4>
-                                <p>机场、高铁站等核心商业点位供不应求，资源价值凸显</p>
-                            </div>
-                        </div>
-                        <div class="driver-item">
-                            <div class="driver-number">03</div>
-                            <div class="driver-content">
-                                <h4>专业化运营需求</h4>
-                                <p>AI技术+专业团队，提升运营效率和风险控制能力</p>
-                            </div>
-                        </div>
-                        <div class="driver-item">
-                            <div class="driver-number">04</div>
-                            <div class="driver-content">
-                                <h4>资本市场活跃</h4>
-                                <p>RBF模式创新，吸引更多机构投资者进入加盟赛道</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Investment Calculator -->
-            <section id="calculator" class="section">
-                <h2 class="section-title">投资计算器</h2>
-                <p class="section-description">输入投资参数，计算回报指标</p>
-                
-                <div class="card">
-                    <form id="calculatorForm">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="investAmount">投资金额（万元）</label>
-                                <input type="number" id="investAmount" placeholder="100">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="monthlyRevenue">月营业额（万元）</label>
-                                <input type="number" id="monthlyRevenue" placeholder="30">
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="shareRatio">分成比例（%）</label>
-                                <input type="number" id="shareRatio" placeholder="10">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="annualRate">预期收益率（静态年化 %）</label>
-                                <input type="number" id="annualRate" placeholder="15">
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="startYear">起投时间</label>
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <select id="startYear" style="flex: 1;">
-                                        <option value="">选择年份</option>
-                                    </select>
-                                    <select id="startMonth" style="flex: 1;">
-                                        <option value="">选择月份</option>
-                                        <option value="01">1月</option>
-                                        <option value="02">2月</option>
-                                        <option value="03">3月</option>
-                                        <option value="04">4月</option>
-                                        <option value="05">5月</option>
-                                        <option value="06">6月</option>
-                                        <option value="07">7月</option>
-                                        <option value="08">8月</option>
-                                        <option value="09">9月</option>
-                                        <option value="10">10月</option>
-                                        <option value="11">11月</option>
-                                        <option value="12">12月</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <!-- 空白占位，保持布局一致 -->
-                            </div>
-                        </div>
-                        
-                        <div class="button-group">
-                            <button type="button" onclick="calculateROI()">计算回报</button>
-                            <button type="button" class="btn-secondary" onclick="resetCalculator()">重置</button>
-                        </div>
-                    </form>
-                </div>
-                
-                <!-- Calculator Results -->
-                <div id="calculatorResults" class="result-card hidden">
-                    <h3 class="result-title">
-                        投资回报计算输出
-                        <i class="fas fa-info-circle" onclick="toggleCalculationLogic()" style="cursor: pointer; color: #00A3E0; font-size: 1rem; margin-left: 0.5rem;" title="查看计算逻辑"></i>
-                    </h3>
-                    <div class="result-grid">
-                        <div class="result-item">
-                            <div class="result-item-label">预计封顶期限</div>
-                            <div class="result-item-value highlight" id="durationDays">-</div>
-                        </div>
-                        <div class="result-item">
-                            <div class="result-item-label">预计封顶时间</div>
-                            <div class="result-item-value highlight" id="endDate">-</div>
-                        </div>
-                        <div class="result-item">
-                            <div class="result-item-label">预计封顶金额</div>
-                            <div class="result-item-value highlight" id="cappedAmount">-</div>
-                        </div>
-                    </div>
-                    
-                    <p class="text-secondary" style="font-size: 0.9rem; margin-top: 1rem; font-style: italic;">
-                        备注：按日平息进行封顶计算
-                    </p>
-                    
-                    <div id="calculationLogic" class="calculation-logic hidden">
-                        <h4 class="logic-title">计算逻辑</h4>
-                        <div class="logic-content">
-                            <p><strong>核心公式：</strong></p>
-                            <p>投资金额 × (1 + 预期收益率/100/360 × 预计联营期限) = 月营业额/30 × 预计联营期限 × 分成比例/100</p>
-                            
-                            <p class="mt-2"><strong>1. 预计联营期限（天）</strong></p>
-                            <p>求解得：预计联营期限 = 投资金额 / (月营业额 × 分成比例/3000 - 投资金额 × 预期收益率/36000)</p>
-                            
-                            <p class="mt-2"><strong>2. 预计封顶金额</strong> = 投资金额 × (1 + 预期收益率/100/360 × 预计联营期限)</p>
-                            
-                            <p class="mt-2 text-secondary" style="font-size: 0.85rem;">
-                                注：预期收益率按日息计算（年化/360天），预计联营期限单位为天
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Enterprise Screening -->
-            <section id="screening" class="section">
-                <h2 class="section-title">被投企业筛选评估</h2>
-                <p class="section-description">基于标准进行企业评分（满分100分）</p>
-                
-                <div class="card">
-                    <h3 class="card-title">企业基本信息</h3>
-                    <form id="screeningForm">
-                        <div class="form-group">
-                            <label for="enterpriseName">企业名称</label>
-                            <input type="text" id="enterpriseName" placeholder="例如：肆瓦商业">
-                        </div>
-                        
-                        <h4 class="mt-3 mb-2">行业通识标准（权重30%）</h4>
-                        
-                        <div class="form-group">
-                            <label for="criteria1">1. 优质点位获取能力（满分15分）</label>
-                            <select id="criteria1">
-                                <option value="">请选择</option>
-                                <option value="15">优秀 - 15分</option>
-                                <option value="11">良好 - 11分</option>
-                                <option value="8">一般 - 8分</option>
-                                <option value="4">较弱 - 4分</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="criteria2">2. 收入与履约保障能力（满分10分）</label>
-                            <select id="criteria2">
-                                <option value="">请选择</option>
-                                <option value="10">优秀 - 10分</option>
-                                <option value="7">良好 - 7分</option>
-                                <option value="5">一般 - 5分</option>
-                                <option value="2">较弱 - 2分</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="criteria3">3. 拓展与整合能力（满分5分）</label>
-                            <select id="criteria3">
-                                <option value="">请选择</option>
-                                <option value="5">优秀 - 5分</option>
-                                <option value="4">良好 - 4分</option>
-                                <option value="3">一般 - 3分</option>
-                                <option value="1">较弱 - 1分</option>
-                            </select>
-                        </div>
-                        
-                        <h4 class="mt-3 mb-2">分析报告专属标准（权重70%）</h4>
-                        
-                        <div class="form-group">
-                            <label for="criteria4">4. 历史项目履约情况（满分20分）</label>
-                            <select id="criteria4">
-                                <option value="">请选择</option>
-                                <option value="20">优秀 - 20分</option>
-                                <option value="15">良好 - 15分</option>
-                                <option value="10">一般 - 10分</option>
-                                <option value="5">较弱 - 5分</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="criteria5">5. AI技术应用能力（满分15分）</label>
-                            <select id="criteria5">
-                                <option value="">请选择</option>
-                                <option value="15">优秀 - 15分</option>
-                                <option value="11">良好 - 11分</option>
-                                <option value="8">一般 - 8分</option>
-                                <option value="4">较弱 - 4分</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="criteria6">6. 品牌资源整合能力（满分15分）</label>
-                            <select id="criteria6">
-                                <option value="">请选择</option>
-                                <option value="15">优秀 - 15分</option>
-                                <option value="11">良好 - 11分</option>
-                                <option value="8">一般 - 8分</option>
-                                <option value="4">较弱 - 4分</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="criteria7">7. 资金使用效率（满分10分）</label>
-                            <select id="criteria7">
-                                <option value="">请选择</option>
-                                <option value="10">优秀 - 10分</option>
-                                <option value="7">良好 - 7分</option>
-                                <option value="5">一般 - 5分</option>
-                                <option value="2">较弱 - 2分</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="criteria8">8. 团队专业度（满分10分）</label>
-                            <select id="criteria8">
-                                <option value="">请选择</option>
-                                <option value="10">优秀 - 10分</option>
-                                <option value="7">良好 - 7分</option>
-                                <option value="5">一般 - 5分</option>
-                                <option value="2">较弱 - 2分</option>
-                            </select>
-                        </div>
-                        
-                        <div class="button-group">
-                            <button type="button" onclick="calculateScore()">计算评分</button>
-                            <button type="button" class="btn-secondary" onclick="resetScreening()">重置</button>
-                        </div>
-                    </form>
-                </div>
-                
-                <!-- Screening Results -->
-                <div id="screeningResults" class="result-card hidden">
-                    <div class="score-display">
-                        <div class="score-circle">
-                            <div class="score-number" id="totalScore">0</div>
-                            <div class="score-max">/100</div>
-                        </div>
-                        <div class="score-rating" id="scoreRating">待评估</div>
-                    </div>
-                    
-                    <h3 class="result-title">评估结果</h3>
-                    <div id="scoreRecommendation" class="report-content">
-                        请先完成评分
-                    </div>
-                    
-                    <h3 class="result-title mt-3">风控要点</h3>
-                    <div id="riskControl" class="report-content">
-                        请先完成评分
-                    </div>
-                </div>
-            </section>
-
-            <!-- Contract Design -->
-            <section id="contract" class="section">
-                <h2 class="section-title">协议设计</h2>
-                <p class="section-description">投资协议关键条款一览</p>
-                
-                <!-- Contract Terms with Inline Inputs -->
-                <div class="contract-terms">
-                    <h3 class="terms-title">关键条款</h3>
-                    
-                    <div class="terms-list">
-                        <!-- 01 投资方式 -->
-                        <div class="term-item">
-                            <div class="term-number">01</div>
-                            <div class="term-content">
-                                <h4 class="term-title">投资方式</h4>
-                                <p style="line-height: 2.5;">
-                                    <span style="margin-right: 0.5rem;">甲方</span>
-                                    <input type="text" id="partyA" placeholder="投资方名称" class="inline-input" style="width: 180px; padding: 0.5rem; border: 1px solid #E5E7EB; border-radius: 4px; font-size: 0.95rem;">
-                                    <span style="margin: 0 0.5rem;">投资人民币</span>
-                                    <input type="number" id="contractInvestment" placeholder="100" class="inline-input" style="width: 100px; padding: 0.5rem; border: 1px solid #E5E7EB; border-radius: 4px; font-size: 0.95rem;">
-                                    <span style="margin: 0 0.5rem;">万元，用于</span>
-                                    <input type="text" id="assetScope" placeholder="项目装修、设备采购、品牌加盟费" class="inline-input" style="width: 280px; padding: 0.5rem; border: 1px solid #E5E7EB; border-radius: 4px; font-size: 0.95rem;">
-                                    <span style="margin-left: 0.5rem;">等</span>
-                                </p>
-                                <small style="color: #6B7280; font-size: 0.85rem; margin-top: 0.5rem; display: block;">
-                                    提示：投资金额会自动填充"投资计算器"中的数据
-                                </small>
-                            </div>
-                        </div>
-                        
-                        <!-- 02 收益分配 -->
-                        <div class="term-item">
-                            <div class="term-number">02</div>
-                            <div class="term-content">
-                                <h4 class="term-title">收益分配</h4>
-                                <p style="line-height: 2.5;">
-                                    <span style="margin-right: 0.5rem;">甲方获得</span>
-                                    <input type="text" id="partyB" placeholder="运营方名称" class="inline-input" style="width: 180px; padding: 0.5rem; border: 1px solid #E5E7EB; border-radius: 4px; font-size: 0.95rem;">
-                                    <span style="margin: 0 0.5rem;">（乙方）项目营业额的</span>
-                                    <input type="number" id="contractShareRatio" placeholder="10" class="inline-input" style="width: 80px; padding: 0.5rem; border: 1px solid #E5E7EB; border-radius: 4px; font-size: 0.95rem;">
-                                    <span style="margin: 0 0.5rem;">%作为投资回报，年化收益率</span>
-                                    <input type="number" id="contractAnnualRate" placeholder="15" class="inline-input" style="width: 80px; padding: 0.5rem; border: 1px solid #E5E7EB; border-radius: 4px; font-size: 0.95rem;">
-                                    <span style="margin-left: 0.5rem;">%</span>
-                                </p>
-                                <small style="color: #6B7280; font-size: 0.85rem; margin-top: 0.5rem; display: block;">
-                                    提示：乙方会自动填充"被投企业筛选评估"中的企业名称；分成比例和年化收益率会自动填充
-                                </small>
-                            </div>
-                        </div>
-                        
-                        <!-- 03 封顶机制 -->
-                        <div class="term-item">
-                            <div class="term-number">03</div>
-                            <div class="term-content">
-                                <h4 class="term-title">封顶机制</h4>
-                                <p style="line-height: 2.5;">
-                                    <span style="margin-right: 0.5rem;">滴灌通累计实际取得的收入分成金额合计达到"联营资金金额×(1+</span>
-                                    <input type="number" id="contractAnnualRateCap" placeholder="15" class="inline-input" style="width: 80px; padding: 0.5rem; border: 1px solid #E5E7EB; border-radius: 4px; font-size: 0.95rem;">
-                                    <span style="margin: 0 0.5rem;">%÷360×已联营天数)"金额（合称"分成终止触发事项"），达到封顶，收入分成终止</span>
-                                </p>
-                                <small style="color: #6B7280; font-size: 0.85rem; margin-top: 0.5rem; display: block;">
-                                    提示：预期收益率会自动填充"投资计算器"中的数据
-                                </small>
-                            </div>
-                        </div>
-                        
-                        <!-- 04 数据传输方式 -->
-                        <div class="term-item">
-                            <div class="term-number">04</div>
-                            <div class="term-content">
-                                <h4 class="term-title">数据传输方式</h4>
-                                <p style="line-height: 2.5;">
-                                    <span style="margin-right: 0.5rem;">按照</span>
-                                    <select id="dataFrequency" class="inline-input" style="width: 120px; padding: 0.5rem; border: 1px solid #E5E7EB; border-radius: 4px; font-size: 0.95rem;">
-                                        <option value="">选择频率</option>
-                                        <option value="每月">每月</option>
-                                        <option value="每周">每周</option>
-                                        <option value="每日">每日</option>
-                                    </select>
-                                    <span style="margin: 0 0.5rem;">，</span>
-                                    <select id="dataMode" class="inline-input" style="width: 120px; padding: 0.5rem; border: 1px solid #E5E7EB; border-radius: 4px; font-size: 0.95rem;">
-                                        <option value="">选择方式</option>
-                                        <option value="自动">自动</option>
-                                        <option value="手动">手动</option>
-                                    </select>
-                                    <span style="margin-left: 0.5rem;">进行数据报送</span>
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <!-- 05 分成付款方式 -->
-                        <div class="term-item">
-                            <div class="term-number">05</div>
-                            <div class="term-content">
-                                <h4 class="term-title">分成付款方式</h4>
-                                <p style="line-height: 2.5;">
-                                    <span style="margin-right: 0.5rem;">按照</span>
-                                    <select id="paymentFrequency" class="inline-input" style="width: 120px; padding: 0.5rem; border: 1px solid #E5E7EB; border-radius: 4px; font-size: 0.95rem;">
-                                        <option value="">选择频率</option>
-                                        <option value="每月">每月</option>
-                                        <option value="每周">每周</option>
-                                        <option value="每日">每日</option>
-                                    </select>
-                                    <span style="margin: 0 0.5rem;">，</span>
-                                    <select id="paymentMode" class="inline-input" style="width: 120px; padding: 0.5rem; border: 1px solid #E5E7EB; border-radius: 4px; font-size: 0.95rem;">
-                                        <option value="">选择方式</option>
-                                        <option value="自动">自动</option>
-                                        <option value="手动">手动</option>
-                                    </select>
-                                    <span style="margin-left: 0.5rem;">进行分成打款</span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 生成并复制按钮 -->
-                    <div style="margin-top: 2rem; text-align: center;">
-                        <button onclick="finalizeAndCopy()" style="padding: 0.875rem 2rem; background: #003B5C; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                            <i class="fas fa-copy" style="margin-right: 0.5rem;"></i>
-                            生成并复制文本版本
-                        </button>
-                        <p id="copyStatus" style="margin-top: 0.75rem; color: #00A3E0; font-weight: 600; min-height: 1.5rem;"></p>
-                    </div>
-                </div>
-            </section>
-
-
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-links">
+                <a href="RBO_MANAGER_GUIDE.md" class="footer-link" target="_blank">
+                    <i class="fas fa-book"></i> 管理器使用说明
+                </a>
+                <a href="RBO_USAGE.md" class="footer-link" target="_blank">
+                    <i class="fas fa-book-open"></i> 流程图使用说明
+                </a>
+                <a href="README.md" class="footer-link" target="_blank">
+                    <i class="fas fa-file-alt"></i> 项目文档
+                </a>
+                <a href="https://github.com/ashley-worklab/SuperFranchise_SW" class="footer-link" target="_blank">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+            </div>
+            <div class="footer-copyright">
+                © 2026 滴灌通投资（海南）有限公司 | RBO管理系统 v3.0
+            </div>
         </div>
-    </main>
+    </div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <p>&copy; 2026 滴灌投资（海南）有限公司 | 超级加盟商投资决策平台</p>
-        </div>
-    </footer>
-    
-    <!-- Back to Top Button -->
-    <button id="backToTop" class="back-to-top" onclick="scrollToTop()">
-        <span>↑</span>
-    </button>
+    <script>
+        // Add smooth scroll and loading effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add entrance animations
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.2}s`;
+            });
 
-    <script src="js/main.js"></script>
+            // Track clicks
+            cards.forEach(card => {
+                card.addEventListener('click', function(e) {
+                    // Visual feedback
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 100);
+                });
+            });
+        });
+    </script>
 </body>
 </html>
