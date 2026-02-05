@@ -352,3 +352,72 @@ function initNavigation() {
         });
     });
 }
+
+// ==========================================
+// 协议文本生成和复制
+// ==========================================
+
+function finalizeAndCopy() {
+    // 获取所有输入值
+    const partyA = document.getElementById('partyA').value || '【甲方名称】';
+    const partyB = document.getElementById('partyB').value || '【乙方名称】';
+    const assetScope = document.getElementById('assetScope').value || '【资产范围】';
+    const investment = document.getElementById('contractInvestment').value || '100';
+    const annualRate = document.getElementById('contractAnnualRate').value || '15';
+    const shareRatio = document.getElementById('contractShareRatio').value || '10';
+    const duration = document.getElementById('contractDuration').value || '12';
+    
+    // 计算封顶金额
+    const capAmount = (parseFloat(investment) * (1 + parseFloat(annualRate) / 100)).toFixed(2);
+    
+    // 生成文本版本
+    const textVersion = `
+投资协议关键条款
+
+基本信息：
+• 甲方（投资方）：${partyA}
+• 乙方（运营方）：${partyB}
+• 收入分成资产范围：${assetScope}
+• 投资金额：${investment}万元
+• 年化收益率（静态年化）：${annualRate}%
+• 分成比例：${shareRatio}%
+• 联营期限：${duration}个月
+
+关键条款：
+
+01 投资方式
+甲方以现金方式投资人民币${investment}万元，用于项目装修、设备采购、品牌加盟费等
+
+02 收益分配
+甲方获得项目营业额的${shareRatio}%作为投资回报，年化收益率${annualRate}%
+
+03 封顶机制
+甲方累计分成达到${capAmount}万元（投资本金×${(1 + parseFloat(annualRate) / 100).toFixed(2)}）时，投资关系终止
+
+04 数据报送
+乙方每月1号前报送营业数据，包括营业额明细、品牌入驻、客流量、费用支出
+
+05 支付条款
+乙方每月1号前支付分成款项，逾期按0.5%/日支付违约金
+
+06 退出机制
+联营期${duration}个月，到期或达封顶金额时终止。提前退出需提前通知并返还相应款项
+`.trim();
+    
+    // 复制到剪贴板
+    navigator.clipboard.writeText(textVersion).then(() => {
+        const statusEl = document.getElementById('copyStatus');
+        statusEl.textContent = '✅ 已复制到剪贴板！';
+        statusEl.style.color = '#00A3E0';
+        
+        // 3秒后清除提示
+        setTimeout(() => {
+            statusEl.textContent = '';
+        }, 3000);
+    }).catch(err => {
+        const statusEl = document.getElementById('copyStatus');
+        statusEl.textContent = '❌ 复制失败，请手动复制';
+        statusEl.style.color = '#DC2626';
+        console.error('复制失败:', err);
+    });
+}

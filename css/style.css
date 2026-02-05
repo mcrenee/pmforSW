@@ -1125,3 +1125,49 @@ footer p {
     transform: scale(1.1);
     transition: all 0.2s ease;
 }
+
+/* 协议设计 - 嵌入式输入框样式 */
+.term-input {
+    background: #F8F9FA;
+    border-left: 4px solid #00A3E0 !important;
+}
+
+.term-input .term-number {
+    background: #00A3E0 !important;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+}
+
+.term-input .term-content {
+    width: 100%;
+}
+
+.term-input .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.term-input label {
+    font-size: 0.9rem;
+}
+
+.term-input input {
+    font-size: 0.95rem;
+    padding: 0.75rem;
+}
+
+.term-input small {
+    font-size: 0.75rem !important;
+    line-height: 1.4;
+}
+
+/* Finalize按钮悬停效果 */
+button:has(.fa-copy):hover {
+    background: #00A3E0 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 59, 92, 0.3);
+}
