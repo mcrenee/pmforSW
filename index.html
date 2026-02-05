@@ -121,6 +121,13 @@
                             </div>
                         </div>
                         
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="startDate">起投时间</label>
+                                <input type="month" id="startDate" placeholder="选择年月">
+                            </div>
+                        </div>
+                        
                         <div class="button-group">
                             <button type="button" onclick="calculateROI()">计算回报</button>
                             <button type="button" class="btn-secondary" onclick="resetCalculator()">重置</button>
@@ -133,14 +140,22 @@
                     <h3 class="result-title">投资回报计算输出</h3>
                     <div class="result-grid">
                         <div class="result-item">
-                            <div class="result-item-label">预计联营期限</div>
+                            <div class="result-item-label">预计封顶期限</div>
                             <div class="result-item-value highlight" id="durationDays">-</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-item-label">预计封顶时间</div>
+                            <div class="result-item-value highlight" id="endDate">-</div>
                         </div>
                         <div class="result-item">
                             <div class="result-item-label">预计封顶金额</div>
                             <div class="result-item-value highlight" id="cappedAmount">-</div>
                         </div>
                     </div>
+                    
+                    <p class="text-secondary" style="font-size: 0.9rem; margin-top: 1rem; font-style: italic;">
+                        备注：按日平息进行封顶计算
+                    </p>
                     
                     <div class="calculation-logic">
                         <h4 class="logic-title">计算逻辑</h4>

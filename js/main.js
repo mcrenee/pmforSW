@@ -25,6 +25,7 @@ function calculateROI() {
     const monthlyRevenue = parseFloat(document.getElementById('monthlyRevenue').value);
     const shareRatio = parseFloat(document.getElementById('shareRatio').value);
     const annualRate = parseFloat(document.getElementById('annualRate').value);
+    const startDate = document.getElementById('startDate').value;
     
     if (!investAmount || !monthlyRevenue || !shareRatio || !annualRate) {
         alert('请填写所有必填信息');
@@ -33,6 +34,11 @@ function calculateROI() {
     
     if (investAmount <= 0 || monthlyRevenue <= 0 || shareRatio <= 0 || annualRate <= 0) {
         alert('请输入正确的数值');
+        return;
+    }
+    
+    if (!startDate) {
+        alert('请选择起投时间');
         return;
     }
     
@@ -45,7 +51,7 @@ function calculateROI() {
     const R = shareRatio;
     const A = annualRate;
     
-    // 1. 计算预计联营期限（天）
+    // 1. 计算预计封顶期限（天）
     // 公式推导：D = I / (M×R/3000 - I×A/36000)
     const denominator = (M * R / 3000) - (I * A / 36000);
     
@@ -56,11 +62,21 @@ function calculateROI() {
     
     const durationDays = I / denominator;
     
-    // 2. 预计封顶金额 = 投资金额 × (1 + 预期收益率/100/360×预计联营期限)
+    // 2. 预计封顶金额 = 投资金额 × (1 + 预期收益率/100/360×预计封顶期限)
     const cappedAmount = I * (1 + (A / 100 / 360) * durationDays);
     
-    // 显示结果（只显示两个指标）
+    // 3. 计算预计封顶时间
+    const start = new Date(startDate + '-01'); // 添加日期部分
+    const end = new Date(start);
+    end.setDate(end.getDate() + Math.ceil(durationDays));
+    
+    const endYear = end.getFullYear();
+    const endMonth = (end.getMonth() + 1).toString().padStart(2, '0');
+    const endDateString = `${endYear}年${endMonth}月`;
+    
+    // 显示结果
     document.getElementById('durationDays').textContent = Math.ceil(durationDays) + '天';
+    document.getElementById('endDate').textContent = endDateString;
     document.getElementById('cappedAmount').textContent = cappedAmount.toFixed(2) + '万';
     
     document.getElementById('calculatorResults').classList.remove('hidden');
