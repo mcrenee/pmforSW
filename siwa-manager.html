@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>肆瓦项目管理器 | 上海肆瓦商业管理有限公司</title>
+    <meta name="description" content="肆瓦项目管理器 - RBO项目流程管理与数据登记系统">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
+            background: #f5f7fa;
+            color: #2d3748;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title h1 {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .header-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .btn-white {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-white:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255,255,255,0.3);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* Workflow Section */
+        .workflow-section {
+            background: white;
+            margin: 24px auto;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 20px 32px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: #667eea;
+        }
+
+        /* Project Tabs */
+        .project-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .project-tab {
+            padding: 8px 20px;
+            border: none;
+            background: #e9ecef;
+            color: #495057;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .project-tab:hover {
+            background: #dee2e6;
+        }
+
+        .project-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        /* Workflow Content */
+        .workflow-content {
+            padding: 32px;
+            overflow-x: auto;
+        }
+
+        .project-flow {
+            display: none;
+        }
+
+        .project-flow.active {
+            display: block;
+        }
+
+        /* Flow Container - Horizontal Layout */
+        .flow-container {
+            display: flex;
+            align-items: stretch;
+            gap: 24px;
+            min-width: max-content;
+            padding: 20px 0;
+        }
+
+        /* Flow Step */
+        .flow-step {
+            flex-shrink: 0;
+            width: 280px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .flow-step:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            border-color: #667eea;
+        }
+
+        .flow-step::after {
+            content: '→';
+            position: absolute;
+            right: -34px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 28px;
+            color: #cbd5e0;
+            font-weight: bold;
+        }
+
+        .flow-step:last-child::after {
+            display: none;
+        }
+
+        /* Time Node Special Style */
+        .flow-step.time-node {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+            border-color: #667eea;
+        }
+
+        /* Role Badge */
+        .role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .role-siwa {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .role-mc {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .role-time {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        /* Step Title */
+        .step-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Step Content */
+        .step-content {
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .step-task {
+            margin-bottom: 12px;
+        }
+
+        .step-task-label {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+
+        .step-task-value {
+            color: #4a5568;
+            font-size: 13px;
+        }
+
+        .step-deliverable {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 12px;
+            border-left: 3px solid #667eea;
+        }
+
+        .step-deliverable-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 4px;
+        }
+
+        .step-deliverable-value {
+            font-size: 13px;
+            color: #2d3748;
+        }
+
+        /* Stage Label */
+        .stage-label {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        /* Stage Container */
+        .stage-container {
+            margin-bottom: 40px;
+        }
+
+        /* Registration Section */
+        .registration-section {
+            background: white;
+            margin: 24px auto 40px auto;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            padding: 24px 32px;
+            background: #f8f9fa;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            padding: 24px 32px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .control-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .control-group input,
+        .control-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .control-group input:focus,
+        .control-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* Table Container */
+        .table-container {
+            padding: 0 32px 32px 32px;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 13px;
+            color: #4a5568;
+        }
+
+        .data-table tr:hover {
+            background-color: #f7fafc;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-completed {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-pending {
+            background: #feebc8;
+            color: #744210;
+        }
+
+        .status-processing {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+
+        /* Action Buttons */
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .action-btn-edit {
+            background: #667eea;
+            color: white;
+        }
+
+        .action-btn-delete {
+            background: #fc8181;
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #a0aec0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #2d3748;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a0aec0;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 0 20px;
+            }
+
+            .flow-step {
+                width: 240px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="header-title">
+                <i class="fas fa-project-diagram" style="font-size: 32px;"></i>
+                <div>
+                    <h1>肆瓦项目管理器</h1>
+                    <div class="header-subtitle">上海肆瓦商业管理有限公司</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="index.html" class="btn btn-white">
+                    <i class="fas fa-home"></i>
+                    返回首页
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Workflow Section -->
+        <div class="workflow-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-sitemap"></i>
+                    工作流程图
+                </div>
+                <div class="project-tabs">
+                    <button class="project-tab active" data-project="pudong">浦东DRC项目</button>
+                    <button class="project-tab" data-project="xian-nanjing">西安/南京RBO项目</button>
+                </div>
+            </div>
+
+            <div class="workflow-content">
+                <!-- Pudong DRC Flow -->
+                <div id="pudong-flow" class="project-flow active">
+                    <div class="flow-container">
+                        <!-- Step 1: Time Node -->
+                        <div class="flow-step time-node">
+                            <span class="role-badge role-time">⏰ 时间节点</span>
+                            <div class="step-title">
+                                <i class="fas fa-calendar-day"></i>
+                                每月1号或15号
+                            </div>
+                            <div class="step-content">
+                                <div class="step-task">
+                                    <div class="step-task-label">关键日期</div>
+                                    <div class="step-task-value">浦东DRC项目报数时间节点</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Siwa Email -->
+                        <div class="flow-step">
+                            <span class="role-badge role-siwa">👤 肆瓦</span>
+                            <div class="step-title">
+                                <i class="fas fa-envelope"></i>
+                                邮件报数
+                            </div>
+                            <div class="step-content">
+                                <div class="step-task">
+                                    <div class="step-task-label">任务内容</div>
+                                    <div class="step-task-value">通过邮件报送收入数据</div>
+                                </div>
+                                <div class="step-deliverable">
+                                    <div class="step-deliverable-label">📧 交付物</div>
+                                    <div class="step-deliverable-value">
+                                        • 报数邮件<br>
+                                        • 收件人: am@mcex.mo<br>
+                                        • 抄送: zhangyi@microconnect.com等<br>
+                                        • 包含: 实收金额、RBO编码
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: MC Upload -->
+                        <div class="flow-step">
+                            <span class="role-badge role-mc">👤 MC</span>
+                            <div class="step-title">
+                                <i class="fas fa-upload"></i>
+                                运营平台上传
+                            </div>
+                            <div class="step-content">
+                                <div class="step-task">
+                                    <div class="step-task-label">任务内容</div>
+                                    <div class="step-task-value">在MC运营平台上传Excel报数文件</div>
+                                </div>
+                                <div class="step-deliverable">
+                                    <div class="step-deliverable-label">📄 交付物</div>
+                                    <div class="step-deliverable-value">
+                                        • Excel报数文件<br>
+                                        • 平台: mcisaas.mcc-cido<br>
+                                        • 路径: /revenue-upload#/hand-upload
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Auto Deduction -->
+                        <div class="flow-step">
+                            <span class="role-badge role-mc">👤 MC系统</span>
+                            <div class="step-title">
+                                <i class="fas fa-credit-card"></i>
+                                自动扣款
+                            </div>
+                            <div class="step-content">
+                                <div class="step-task">
+                                    <div class="step-task-label">扣款规则</div>
+                                    <div class="step-task-value">
+                                        ⏰ 12点前上传 → 当日18:00扣款<br>
+                                        ⏰ 12点后上传 → 次日扣款
+                                    </div>
+                                </div>
+                                <div class="step-deliverable">
+                                    <div class="step-deliverable-label">💳 结果</div>
+                                    <div class="step-deliverable-value">
+                                        系统自动完成扣款操作
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Xian/Nanjing RBO Flow -->
+                <div id="xian-nanjing-flow" class="project-flow">
+                    <!-- Stage 1 -->
+                    <div class="stage-container">
+                        <div class="stage-label">
+                            <i class="fas fa-circle"></i> 第一阶段：每月1号/15号（报数环节）
+                        </div>
+                        <div class="flow-container">
+                            <!-- Step 1: Time Node -->
+                            <div class="flow-step time-node">
+                                <span class="role-badge role-time">⏰ 时间节点</span>
+                                <div class="step-title">
+                                    <i class="fas fa-calendar-day"></i>
+                                    每月1号或15号
+                                </div>
+                                <div class="step-content">
+                                    <div class="step-task">
+                                        <div class="step-task-label">阶段任务</div>
+                                        <div class="step-task-value">报数环节</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: Siwa Email -->
+                            <div class="flow-step">
+                                <span class="role-badge role-siwa">👤 肆瓦</span>
+                                <div class="step-title">
+                                    <i class="fas fa-envelope"></i>
+                                    邮件报数
+                                </div>
+                                <div class="step-content">
+                                    <div class="step-task">
+                                        <div class="step-task-label">任务内容</div>
+                                        <div class="step-task-value">通过邮件报送收入数据</div>
+                                    </div>
+                                    <div class="step-deliverable">
+                                        <div class="step-deliverable-label">📧 交付物</div>
+                                        <div class="step-deliverable-value">
+                                            • 报数邮件<br>
+                                            • 时间范围、RBO编码<br>
+                                            • 金额复核确认
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 3: MC OA Report -->
+                            <div class="flow-step">
+                                <span class="role-badge role-mc">👤 MC</span>
+                                <div class="step-title">
+                                    <i class="fas fa-file-alt"></i>
+                                    提报OA
+                                </div>
+                                <div class="step-content">
+                                    <div class="step-task">
+                                        <div class="step-task-label">任务内容</div>
+                                        <div class="step-task-value">在OA系统提报报数材料</div>
+                                    </div>
+                                    <div class="step-deliverable">
+                                        <div class="step-deliverable-label">📄 交付物</div>
+                                        <div class="step-deliverable-value">
+                                            • OA单据<br>
+                                            • 报数邮件截图<br>
+                                            • 参考: IT06-数据修改申请
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stage 2 -->
+                    <div class="stage-container">
+                        <div class="stage-label">
+                            <i class="fas fa-circle"></i> 第二阶段：每月2号/16号（凭证报送 + OA提报）
+                        </div>
+                        <div class="flow-container">
+                            <!-- Step 1: Time Node -->
+                            <div class="flow-step time-node">
+                                <span class="role-badge role-time">⏰ 时间节点</span>
+                                <div class="step-title">
+                                    <i class="fas fa-calendar-check"></i>
+                                    每月2号或16号
+                                </div>
+                                <div class="step-content">
+                                    <div class="step-task">
+                                        <div class="step-task-label">阶段任务</div>
+                                        <div class="step-task-value">凭证报送 + OA提报</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: Siwa Voucher -->
+                            <div class="flow-step">
+                                <span class="role-badge role-siwa">👤 肆瓦</span>
+                                <div class="step-title">
+                                    <i class="fas fa-receipt"></i>
+                                    报送打款凭证
+                                </div>
+                                <div class="step-content">
+                                    <div class="step-task">
+                                        <div class="step-task-label">任务内容</div>
+                                        <div class="step-task-value">通过邮件报送打款凭证</div>
+                                    </div>
+                                    <div class="step-deliverable">
+                                        <div class="step-deliverable-label">📧 交付物</div>
+                                        <div class="step-deliverable-value">
+                                            • 打款凭证邮件<br>
+                                            • 应支付金额说明<br>
+                                            • 打款记录附件
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 3: MC OA Voucher -->
+                            <div class="flow-step">
+                                <span class="role-badge role-mc">👤 MC</span>
+                                <div class="step-title">
+                                    <i class="fas fa-file-invoice"></i>
+                                    提报OA（打款）
+                                </div>
+                                <div class="step-content">
+                                    <div class="step-task">
+                                        <div class="step-task-label">任务内容</div>
+                                        <div class="step-task-value">在OA系统提报打款材料</div>
+                                    </div>
+                                    <div class="step-deliverable">
+                                        <div class="step-deliverable-label">📄 交付物</div>
+                                        <div class="step-deliverable-value">
+                                            • OA单据<br>
+                                            • 打款邮件<br>
+                                            • 打款凭证文件
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 4: Complete -->
+                            <div class="flow-step" style="background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%); border-color: #48bb78;">
+                                <span class="role-badge" style="background: #48bb78; color: white;">✅ 完成</span>
+                                <div class="step-title">
+                                    <i class="fas fa-check-circle"></i>
+                                    流程完成
+                                </div>
+                                <div class="step-content">
+                                    <div class="step-task">
+                                        <div class="step-task-label">状态</div>
+                                        <div class="step-task-value">本期RBO处理完成</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration Section -->
+        <div class="registration-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-clipboard-list"></i>
+                    数据登记管理
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">总记录数</div>
+                    <div class="stat-value" id="total-count">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">已完成</div>
+                    <div class="stat-value" id="completed-count">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">处理中</div>
+                    <div class="stat-value" id="processing-count">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">总打款金额</div>
+                    <div class="stat-value" id="total-amount">¥0</div>
+                </div>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <div class="control-row">
+                    <div class="control-group">
+                        <label>
+                            <i class="fas fa-search"></i> 搜索
+                        </label>
+                        <input type="text" id="search-input" placeholder="输入RBO编码或项目简称...">
+                    </div>
+                    <div class="control-group">
+                        <label>
+                            <i class="fas fa-filter"></i> 状态筛选
+                        </label>
+                        <select id="status-filter">
+                            <option value="">全部状态</option>
+                            <option value="已完成">已完成</option>
+                            <option value="处理中">处理中</option>
+                            <option value="待处理">待处理</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>
+                            <i class="fas fa-calendar"></i> 日期筛选
+                        </label>
+                        <input type="date" id="date-filter">
+                    </div>
+                    <div class="control-group" style="flex: 0;">
+                        <label>&nbsp;</label>
+                        <button class="btn btn-primary" onclick="addRecord()">
+                            <i class="fas fa-plus"></i>
+                            新增记录
+                        </button>
+                    </div>
+                    <div class="control-group" style="flex: 0;">
+                        <label>&nbsp;</label>
+                        <button class="btn btn-success" onclick="exportToExcel()">
+                            <i class="fas fa-file-excel"></i>
+                            导出Excel
+                        </button>
+                    </div>
+                    <div class="control-group" style="flex: 0;">
+                        <label>&nbsp;</label>
+                        <button class="btn btn-secondary" onclick="importFromExcel()">
+                            <i class="fas fa-file-upload"></i>
+                            导入
+                        </button>
+                    </div>
+                </div>
+                <input type="file" id="import-file" accept=".xlsx,.xls" style="display: none;" onchange="handleFileImport(event)">
+            </div>
+
+            <!-- Table Container -->
+            <div class="table-container">
+                <div id="table-content">
+                    <!-- Table will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="record-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">新增RBO记录</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+
+            <form id="record-form" onsubmit="saveRecord(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>处理日期 *</label>
+                        <input type="date" name="processDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>状态 *</label>
+                        <select name="status" required>
+                            <option value="">请选择</option>
+                            <option value="已完成">已完成</option>
+                            <option value="处理中">处理中</option>
+                            <option value="待处理">待处理</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>系统 *</label>
+                        <input type="text" name="system" placeholder="如：二合一" required>
+                    </div>
+                    <div class="form-group">
+                        <label>RBO编码 *</label>
+                        <input type="text" name="rboCode" placeholder="如：RT-CN0100-PAWSV0001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>内部RBO编码 *</label>
+                        <input type="text" name="internalCode" placeholder="如：R0000000003" required>
+                    </div>
+                    <div class="form-group">
+                        <label>简称 *</label>
+                        <input type="text" name="shortName" placeholder="如：上海肆瓦南京机场（二合一）" required>
+                    </div>
+                    <div class="form-group">
+                        <label>分成周期开始日 *</label>
+                        <input type="date" name="periodStart" required>
+                    </div>
+                    <div class="form-group">
+                        <label>分成周期结束日 *</label>
+                        <input type="date" name="periodEnd" required>
+                    </div>
+                    <div class="form-group">
+                        <label>信息流OA</label>
+                        <input type="text" name="infoOA" placeholder="如：IT06-20250801001">
+                    </div>
+                    <div class="form-group">
+                        <label>信息流处理日期</label>
+                        <input type="date" name="infoDate">
+                    </div>
+                    <div class="form-group">
+                        <label>应打款金额 *</label>
+                        <input type="number" step="0.01" name="expectedAmount" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>实际打款金额 *</label>
+                        <input type="number" step="0.01" name="actualAmount" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>资金流OA单</label>
+                        <input type="text" name="fundOA" placeholder="如：/表示无">
+                    </div>
+                    <div class="form-group">
+                        <label>资金流处理日期</label>
+                        <input type="date" name="fundDate">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">
+                        <i class="fas fa-times"></i>
+                        取消
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="rbo-data.js"></script>
+    <script>
+        // Project tab switching
+        document.querySelectorAll('.project-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.project-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.project-flow').forEach(f => f.classList.remove('active'));
+                
+                this.classList.add('active');
+                const project = this.dataset.project;
+                document.getElementById(`${project}-flow`).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

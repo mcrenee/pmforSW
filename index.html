@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RBO管理系统 | 报数打款管理平台</title>
-    <meta name="description" content="RBO管理系统 - 固定期限RBO处理流程与登记管理平台">
+    <title>肆瓦项目管理器 | 上海肆瓦商业管理有限公司</title>
+    <meta name="description" content="肆瓦项目管理器 - RBO项目流程管理与数据登记系统">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -24,7 +24,7 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 600px;
             width: 100%;
         }
 
@@ -34,6 +34,12 @@
             color: white;
             margin-bottom: 60px;
             animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header-logo {
+            font-size: 72px;
+            margin-bottom: 24px;
+            text-shadow: 0 8px 24px rgba(0,0,0,0.3);
         }
 
         .header h1 {
@@ -49,129 +55,126 @@
             text-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
-        /* Cards Grid */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 32px;
-            margin-bottom: 40px;
-        }
-
+        /* Card */
         .card {
             background: white;
-            border-radius: 20px;
-            padding: 40px;
+            border-radius: 24px;
+            padding: 48px;
             text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-            animation: fadeInUp 0.8s ease-out;
-        }
-
-        .card:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-
-        .card-icon {
-            font-size: 64px;
-            margin-bottom: 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
         }
 
         .card-title {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
             color: #2d3748;
+            margin-bottom: 32px;
+        }
+
+        .btn-enter {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 20px 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 20px;
+            transition: all 0.3s;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-enter:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.6);
+        }
+
+        .features {
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .feature-item {
+            text-align: left;
+            padding: 16px;
+            background: #f7fafc;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .feature-item:hover {
+            background: #edf2f7;
+            transform: translateX(4px);
+        }
+
+        .feature-icon {
+            font-size: 24px;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .feature-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+
+        .feature-desc {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        /* Projects */
+        .projects {
+            margin-top: 32px;
+        }
+
+        .projects-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
             margin-bottom: 16px;
         }
 
-        .card-description {
-            font-size: 16px;
-            color: #718096;
-            line-height: 1.6;
-            margin-bottom: 24px;
-        }
-
-        .card-features {
-            list-style: none;
-            text-align: left;
-            margin-bottom: 24px;
-        }
-
-        .card-features li {
-            padding: 8px 0;
-            color: #4a5568;
-            font-size: 14px;
+        .project-tags {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
-        .card-features li i {
-            color: #667eea;
-            font-size: 16px;
-        }
-
-        .card-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 32px;
+        .project-tag {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border-radius: 10px;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
             font-weight: 600;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        .card:hover .card-button {
-            transform: scale(1.05);
         }
 
         /* Footer */
         .footer {
             text-align: center;
             color: white;
-            padding: 20px;
+            margin-top: 40px;
             animation: fadeIn 1s ease-out 0.5s both;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-
-        .footer-link {
-            color: white;
-            text-decoration: none;
-            font-size: 14px;
-            opacity: 0.9;
-            transition: opacity 0.2s;
-        }
-
-        .footer-link:hover {
-            opacity: 1;
-            text-decoration: underline;
         }
 
         .footer-copyright {
             font-size: 14px;
-            opacity: 0.8;
+            opacity: 0.9;
         }
 
         /* Animations */
@@ -216,66 +219,18 @@
                 font-size: 16px;
             }
 
-            .cards-grid {
+            .card {
+                padding: 32px 24px;
+            }
+
+            .btn-enter {
+                padding: 16px 36px;
+                font-size: 18px;
+            }
+
+            .features-grid {
                 grid-template-columns: 1fr;
             }
-
-            .card {
-                padding: 30px;
-            }
-
-            .card-icon {
-                font-size: 48px;
-            }
-
-            .card-title {
-                font-size: 24px;
-            }
-        }
-
-        /* Info Banner */
-        .info-banner {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 40px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            animation: fadeIn 0.8s ease-out 0.3s both;
-        }
-
-        .info-banner h3 {
-            color: #2d3748;
-            font-size: 20px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .info-banner h3 i {
-            color: #667eea;
-        }
-
-        .info-banner p {
-            color: #4a5568;
-            line-height: 1.6;
-            font-size: 15px;
-        }
-
-        .projects-list {
-            display: flex;
-            gap: 16px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-        }
-
-        .project-tag {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
         }
     </style>
 </head>
@@ -283,113 +238,77 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1><i class="fas fa-chart-line"></i> RBO管理系统</h1>
-            <p>固定期限RBO处理流程与登记管理平台</p>
-        </div>
-
-        <!-- Info Banner -->
-        <div class="info-banner">
-            <h3>
-                <i class="fas fa-info-circle"></i>
-                支持项目
-            </h3>
-            <p>本系统支持以下RBO项目的流程管理和数据登记：</p>
-            <div class="projects-list">
-                <span class="project-tag">浦东DRC项目</span>
-                <span class="project-tag">西安RBO项目</span>
-                <span class="project-tag">南京RBO项目</span>
+            <div class="header-logo">
+                <i class="fas fa-project-diagram"></i>
             </div>
+            <h1>肆瓦项目管理器</h1>
+            <p>上海肆瓦商业管理有限公司</p>
         </div>
 
-        <!-- Cards Grid -->
-        <div class="cards-grid">
-            <!-- RBO Manager Card -->
-            <a href="rbo-manager.html" class="card">
-                <div class="card-icon">
-                    <i class="fas fa-clipboard-list"></i>
-                </div>
-                <h2 class="card-title">RBO登记管理器</h2>
-                <p class="card-description">
-                    完整的报数打款登记与追踪系统，管理所有RBO处理记录
-                </p>
-                <ul class="card-features">
-                    <li><i class="fas fa-check-circle"></i> 14个关键字段全覆盖</li>
-                    <li><i class="fas fa-search"></i> 智能搜索和多维筛选</li>
-                    <li><i class="fas fa-chart-bar"></i> 实时统计与数据分析</li>
-                    <li><i class="fas fa-file-excel"></i> Excel导入导出功能</li>
-                    <li><i class="fas fa-database"></i> 本地数据持久化存储</li>
-                </ul>
-                <div class="card-button">
-                    进入管理器
-                    <i class="fas fa-arrow-right"></i>
-                </div>
+        <!-- Card -->
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-rocket" style="color: #667eea; margin-right: 8px;"></i>
+                RBO项目流程管理系统
+            </div>
+
+            <a href="siwa-manager.html" class="btn-enter">
+                进入系统
+                <i class="fas fa-arrow-right"></i>
             </a>
 
-            <!-- RBO Process Card -->
-            <a href="rbo-process.html" class="card">
-                <div class="card-icon">
-                    <i class="fas fa-project-diagram"></i>
+            <div class="features">
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-sitemap"></i>
+                        </div>
+                        <div class="feature-title">工作流程图</div>
+                        <div class="feature-desc">可视化展示项目流程</div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="feature-title">数据登记</div>
+                        <div class="feature-desc">完整的记录管理系统</div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-file-excel"></i>
+                        </div>
+                        <div class="feature-title">Excel导入导出</div>
+                        <div class="feature-desc">便捷的数据处理</div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="feature-title">实时统计</div>
+                        <div class="feature-desc">数据自动汇总分析</div>
+                    </div>
                 </div>
-                <h2 class="card-title">RBO流程图</h2>
-                <p class="card-description">
-                    交互式流程图展示固定期限RBO处理流程，清晰了解操作步骤
-                </p>
-                <ul class="card-features">
-                    <li><i class="fas fa-exchange-alt"></i> 项目模块快速切换</li>
-                    <li><i class="fas fa-clock"></i> 关键时间节点标注</li>
-                    <li><i class="fas fa-users"></i> 执行方分工清晰</li>
-                    <li><i class="fas fa-envelope"></i> 完整邮件模板展示</li>
-                    <li><i class="fas fa-search-plus"></i> 支持缩放拖拽查看</li>
-                </ul>
-                <div class="card-button">
-                    查看流程图
-                    <i class="fas fa-arrow-right"></i>
+            </div>
+
+            <div class="projects">
+                <div class="projects-title">支持项目</div>
+                <div class="project-tags">
+                    <span class="project-tag">浦东DRC</span>
+                    <span class="project-tag">西安RBO</span>
+                    <span class="project-tag">南京RBO</span>
                 </div>
-            </a>
+            </div>
         </div>
 
         <!-- Footer -->
         <div class="footer">
-            <div class="footer-links">
-                <a href="RBO_MANAGER_GUIDE.md" class="footer-link" target="_blank">
-                    <i class="fas fa-book"></i> 管理器使用说明
-                </a>
-                <a href="RBO_USAGE.md" class="footer-link" target="_blank">
-                    <i class="fas fa-book-open"></i> 流程图使用说明
-                </a>
-                <a href="README.md" class="footer-link" target="_blank">
-                    <i class="fas fa-file-alt"></i> 项目文档
-                </a>
-                <a href="https://github.com/ashley-worklab/SuperFranchise_SW" class="footer-link" target="_blank">
-                    <i class="fab fa-github"></i> GitHub
-                </a>
-            </div>
             <div class="footer-copyright">
-                © 2026 滴灌通投资（海南）有限公司 | RBO管理系统 v3.0
+                © 2026 上海肆瓦商业管理有限公司 | 版本 v1.0
             </div>
         </div>
     </div>
-
-    <script>
-        // Add smooth scroll and loading effects
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add entrance animations
-            const cards = document.querySelectorAll('.card');
-            cards.forEach((card, index) => {
-                card.style.animationDelay = `${index * 0.2}s`;
-            });
-
-            // Track clicks
-            cards.forEach(card => {
-                card.addEventListener('click', function(e) {
-                    // Visual feedback
-                    this.style.transform = 'scale(0.98)';
-                    setTimeout(() => {
-                        this.style.transform = '';
-                    }, 100);
-                });
-            });
-        });
-    </script>
 </body>
 </html>
