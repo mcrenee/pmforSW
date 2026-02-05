@@ -17,7 +17,34 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 初始化年份选择器
     initYearSelector();
+    
+    // 初始化企业名称自动填充
+    initAutoFillPartyB();
 });
+
+// 初始化企业名称自动填充
+function initAutoFillPartyB() {
+    const enterpriseNameInput = document.getElementById('enterpriseName');
+    const partyBInput = document.getElementById('partyB');
+    
+    // 监听企业名称输入框的变化
+    enterpriseNameInput.addEventListener('input', function() {
+        const enterpriseName = this.value.trim();
+        if (enterpriseName) {
+            // 自动填充到乙方字段
+            partyBInput.value = enterpriseName;
+            console.log(`✅ 自动填充乙方（运营方）: ${enterpriseName}`);
+        }
+    });
+    
+    // 监听企业名称失去焦点
+    enterpriseNameInput.addEventListener('blur', function() {
+        const enterpriseName = this.value.trim();
+        if (enterpriseName) {
+            partyBInput.value = enterpriseName;
+        }
+    });
+}
 
 // 初始化年份选择器
 function initYearSelector() {
@@ -127,6 +154,9 @@ function calculateScore() {
         alert('请输入企业名称');
         return;
     }
+    
+    // 自动填充到协议设计的乙方字段
+    document.getElementById('partyB').value = enterpriseName;
     
     // 收集评分
     let totalScore = 0;
