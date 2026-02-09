@@ -61,6 +61,14 @@
         .form-group input, .form-group select { padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; }
         .form-group input:focus, .form-group select:focus { outline: none; border-color: #667eea; }
         .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
+        .advanced-filter { background: #f8f9fa; padding: 20px 24px; border-bottom: 1px solid #e9ecef; }
+        .filter-header { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #2d3748; }
+        .filter-condition { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; padding: 12px; background: white; border-radius: 8px; }
+        .filter-condition select, .filter-condition input { padding: 8px 12px; border: 2px solid #e2e8f0; border-radius: 6px; font-size: 14px; }
+        .filter-condition select { flex: 1; max-width: 200px; }
+        .filter-condition input { flex: 2; }
+        .filter-remove { color: #e53e3e; cursor: pointer; padding: 8px 12px; }
+        .filter-remove:hover { background: #ffe5e5; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -124,6 +132,17 @@
                     <option value="二合一">二合一</option>
                     <option value="全流程">全流程</option>
                 </select>
+                <button class="btn btn-secondary" onclick="toggleAdvancedFilter()"><i class="fas fa-filter"></i> 高级筛选</button>
+                <button class="btn btn-secondary" onclick="clearAllFilters()"><i class="fas fa-times"></i> 清除筛选</button>
+            </div>
+
+            <!-- 高级筛选面板 -->
+            <div id="advancedFilterPanel" class="advanced-filter" style="display: none;">
+                <div class="filter-header">
+                    <h3><i class="fas fa-filter"></i> 高级筛选</h3>
+                </div>
+                <div id="filterConditions"></div>
+                <button class="btn btn-secondary" onclick="addFilterCondition()"><i class="fas fa-plus"></i> 添加条件</button>
             </div>
 
             <div class="table-container">
@@ -238,6 +257,6 @@
         </div>
     </div>
 
-    <script src="data-entry-v2.js?v=5"></script>
+    <script src="data-entry-v2.js?v=6"></script>
 </body>
 </html>

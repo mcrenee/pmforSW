@@ -127,22 +127,7 @@ function updateStatistics() {
 
 // 筛选记录
 function filterRecords() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const statusFilter = document.getElementById('statusFilter').value;
-    const systemFilter = document.getElementById('systemFilter').value;
-    
-    filteredRecords = allRecords.filter(record => {
-        const matchSearch = !searchTerm || 
-            Object.values(record).some(val => 
-                String(val).toLowerCase().includes(searchTerm)
-            );
-        const matchStatus = !statusFilter || record.status === statusFilter;
-        const matchSystem = !systemFilter || record.system === systemFilter;
-        
-        return matchSearch && matchStatus && matchSystem;
-    });
-    
-    renderTable();
+    applyAdvancedFilters(); // 统一使用高级筛选逻辑
 }
 
 // 显示编辑表单
@@ -339,6 +324,177 @@ function exportToExcel() {
     
     const fileName = `RBO数据_${new Date().toISOString().split('T')[0]}.xlsx`;
     XLSX.writeFile(wb, fileName);
+}
+
+// 高级筛选功能
+let advancedFilters = [];
+let filterCounter = 0;
+
+// 字段映射（中文名 -> 英文字段名）
+const FIELD_MAPPING = {
+    '处理日期': 'processDate',
+    '状态': 'status',
+    '系统': 'system',
+    'RBO编码': 'rboCode',
+    '内部RBO编码': 'internalRboCode',
+    '简称': 'shortName',
+    '交易账号': 'tradingAccount',
+    '周期开始日': 'cycleStartDate',
+    '周期结束日': 'cycleEndDate',
+    '信息流OA': 'infoFlowOA',
+    '信息流日期': 'infoFlowDate',
+    '应打款金额': 'payableAmount',
+    '实际打款金额': 'actualAmount',
+    '资金流OA单': 'capitalFlowOA',
+    '资金流日期': 'capitalFlowDate'
+};
+
+// 显示/隐藏高级筛选面板
+function toggleAdvancedFilter() {
+    const panel = document.getElementById('advancedFilterPanel');
+    if (panel.style.display === 'none') {
+        panel.style.display = 'block';
+        if (advancedFilters.length === 0) {
+            addFilterCondition();
+        }
+    } else {
+        panel.style.display = 'none';
+    }
+}
+
+// 添加筛选条件
+function addFilterCondition() {
+    filterCounter++;
+    const filterId = `filter_${filterCounter}`;
+    
+    const filterDiv = document.createElement('div');
+    filterDiv.className = 'filter-condition';
+    filterDiv.id = filterId;
+    
+    filterDiv.innerHTML = `
+        <select class="filter-field" onchange="applyAdvancedFilters()">
+            <option value="">选择字段</option>
+            ${Object.keys(FIELD_MAPPING).map(field => 
+                `<option value="${FIELD_MAPPING[field]}">${field}</option>`
+            ).join('')}
+        </select>
+        <select class="filter-operator" onchange="applyAdvancedFilters()">
+            <option value="contains">包含</option>
+            <option value="equals">等于</option>
+            <option value="startsWith">开头是</option>
+            <option value="endsWith">结尾是</option>
+            <option value="greater">大于</option>
+            <option value="less">小于</option>
+        </select>
+        <input type="text" class="filter-value" placeholder="输入筛选值..." oninput="applyAdvancedFilters()">
+        <button class="filter-remove" onclick="removeFilterCondition('${filterId}')">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    document.getElementById('filterConditions').appendChild(filterDiv);
+    advancedFilters.push(filterId);
+}
+
+// 删除筛选条件
+function removeFilterCondition(filterId) {
+    document.getElementById(filterId).remove();
+    advancedFilters = advancedFilters.filter(id => id !== filterId);
+    applyAdvancedFilters();
+}
+
+// 应用高级筛选
+function applyAdvancedFilters() {
+    const conditions = [];
+    
+    advancedFilters.forEach(filterId => {
+        const filterDiv = document.getElementById(filterId);
+        if (!filterDiv) return;
+        
+        const field = filterDiv.querySelector('.filter-field').value;
+        const operator = filterDiv.querySelector('.filter-operator').value;
+        const value = filterDiv.querySelector('.filter-value').value;
+        
+        if (field && value) {
+            conditions.push({ field, operator, value });
+        }
+    });
+    
+    // 结合基础筛选和高级筛选
+    let results = [...allRecords];
+    
+    // 基础筛选（搜索框、状态、系统）
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const statusFilter = document.getElementById('statusFilter').value;
+    const systemFilter = document.getElementById('systemFilter').value;
+    
+    if (searchTerm) {
+        results = results.filter(record => 
+            Object.values(record).some(val => 
+                String(val).toLowerCase().includes(searchTerm)
+            )
+        );
+    }
+    
+    if (statusFilter) {
+        results = results.filter(record => record.status === statusFilter);
+    }
+    
+    if (systemFilter) {
+        results = results.filter(record => record.system === systemFilter);
+    }
+    
+    // 应用高级筛选条件
+    conditions.forEach(condition => {
+        results = results.filter(record => {
+            const fieldValue = String(record[condition.field] || '').toLowerCase();
+            const filterValue = condition.value.toLowerCase();
+            
+            switch (condition.operator) {
+                case 'contains':
+                    return fieldValue.includes(filterValue);
+                case 'equals':
+                    return fieldValue === filterValue;
+                case 'startsWith':
+                    return fieldValue.startsWith(filterValue);
+                case 'endsWith':
+                    return fieldValue.endsWith(filterValue);
+                case 'greater':
+                    return parseFloat(record[condition.field]) > parseFloat(condition.value);
+                case 'less':
+                    return parseFloat(record[condition.field]) < parseFloat(condition.value);
+                default:
+                    return true;
+            }
+        });
+    });
+    
+    filteredRecords = results;
+    renderTable();
+    updateStatistics();
+}
+
+// 清除所有筛选
+function clearAllFilters() {
+    // 清除基础筛选
+    document.getElementById('searchInput').value = '';
+    document.getElementById('statusFilter').value = '';
+    document.getElementById('systemFilter').value = '';
+    
+    // 清除高级筛选
+    advancedFilters.forEach(filterId => {
+        const filterDiv = document.getElementById(filterId);
+        if (filterDiv) filterDiv.remove();
+    });
+    advancedFilters = [];
+    
+    // 隐藏高级筛选面板
+    document.getElementById('advancedFilterPanel').style.display = 'none';
+    
+    // 重置数据
+    filteredRecords = [...allRecords];
+    renderTable();
+    updateStatistics();
 }
 
 // 页面加载时初始化
