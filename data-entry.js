@@ -2,12 +2,12 @@
 let allRecords = [];
 let filteredRecords = [];
 
-// RBO投资总额配置（实际投资数据）
+// RBO投资总额配置（实际投资数据 - 税费前）
 const RBO_INVESTMENTS = {
-    'RT-CN0100-PAWSV0001': { name: '上海肆瓦南京机场（二合一）', investment: 3000000 },
-    'SV-CN0100-AURABJYX0001': { name: '北京澳尔医院RBO（二合一）', investment: 800000 },
-    'RT-CN3101-SHWS0001-I': { name: '上海肆瓦浦东机场（全流程）', investment: 1000000 },
-    'OT-CN0100-PAWSV0002': { name: '上海肆瓦西安机场（二合一）', investment: 1500000 }
+    'RT-CN3101-SHWS0001-I': { name: '浦东机场（DRC）', investment: 2900000 },
+    'RT-CN0100-PAWSV0001': { name: '南京机场', investment: 2650000 },
+    'OT-CN0100-PAWSV0002': { name: '西安机场', investment: 1700000 },
+    'SV-CN0100-AURABJYX0001': { name: '澳尔医院', investment: 1980000 }
 };
 
 // 加载数据
