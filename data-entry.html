@@ -48,6 +48,19 @@
         .status-pending { background: #e2e8f0; color: #2d3748; }
         .edit-btn { color: #667eea; cursor: pointer; }
         .edit-btn:hover { color: #764ba2; }
+        .btn-icon { background: none; border: none; cursor: pointer; font-size: 16px; padding: 6px 10px; margin: 0 2px; border-radius: 4px; transition: all 0.2s; }
+        .btn-icon.edit { color: #667eea; }
+        .btn-icon.edit:hover { background: #e6e9ff; }
+        .btn-icon.delete { color: #e53e3e; }
+        .btn-icon.delete:hover { background: #ffe5e5; }
+        .edit-form { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto; }
+        .form-container { max-width: 800px; margin: 40px auto; background: white; border-radius: 16px; padding: 32px; }
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 24px 0; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { font-size: 14px; font-weight: 600; color: #4a5568; margin-bottom: 6px; }
+        .form-group input, .form-group select { padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #667eea; }
+        .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px; }
     </style>
 </head>
 <body>
@@ -90,7 +103,10 @@
         <div class="data-section">
             <div class="section-header">
                 <h2><i class="fas fa-table"></i> 数据记录</h2>
-                <button class="btn btn-primary" onclick="exportToExcel()"><i class="fas fa-download"></i> 导出Excel</button>
+                <div>
+                    <button class="btn btn-primary" onclick="showAddForm()" style="margin-right: 12px;"><i class="fas fa-plus"></i> 新增记录</button>
+                    <button class="btn btn-primary" onclick="exportToExcel()"><i class="fas fa-download"></i> 导出Excel</button>
+                </div>
             </div>
 
             <div class="controls">
@@ -129,6 +145,7 @@
                             <th>实际打款</th>
                             <th>资金流OA</th>
                             <th>资金流日期</th>
+                            <th>操作</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
@@ -137,6 +154,90 @@
         </div>
     </div>
 
-    <script src="data-entry.js?v=4"></script>
+    <!-- 编辑/新增表单 -->
+    <div id="editForm" class="edit-form">
+        <div class="form-container">
+            <h2 id="formTitle">编辑记录</h2>
+            <form id="editRecordForm" onsubmit="event.preventDefault(); saveRecord();">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>处理日期</label>
+                        <input type="date" id="editProcessDate">
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select id="editStatus">
+                            <option value="">请选择</option>
+                            <option value="已完成">已完成</option>
+                            <option value="处理中">处理中</option>
+                            <option value="待处理">待处理</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>系统</label>
+                        <select id="editSystem">
+                            <option value="">请选择</option>
+                            <option value="二合一">二合一</option>
+                            <option value="全流程">全流程</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>RBO编码</label>
+                        <input type="text" id="editRboCode">
+                    </div>
+                    <div class="form-group">
+                        <label>内部RBO编码</label>
+                        <input type="text" id="editInternalRboCode">
+                    </div>
+                    <div class="form-group">
+                        <label>简称</label>
+                        <input type="text" id="editShortName">
+                    </div>
+                    <div class="form-group">
+                        <label>交易账号</label>
+                        <input type="text" id="editTradingAccount">
+                    </div>
+                    <div class="form-group">
+                        <label>周期开始日</label>
+                        <input type="date" id="editCycleStartDate">
+                    </div>
+                    <div class="form-group">
+                        <label>周期结束日</label>
+                        <input type="date" id="editCycleEndDate">
+                    </div>
+                    <div class="form-group">
+                        <label>信息流OA</label>
+                        <input type="text" id="editInfoFlowOA">
+                    </div>
+                    <div class="form-group">
+                        <label>信息流处理日期</label>
+                        <input type="date" id="editInfoFlowDate">
+                    </div>
+                    <div class="form-group">
+                        <label>应打款金额</label>
+                        <input type="number" step="0.01" id="editPayableAmount">
+                    </div>
+                    <div class="form-group">
+                        <label>实际打款金额</label>
+                        <input type="number" step="0.01" id="editActualAmount">
+                    </div>
+                    <div class="form-group">
+                        <label>资金流OA单</label>
+                        <input type="text" id="editCapitalFlowOA">
+                    </div>
+                    <div class="form-group">
+                        <label>资金流处理日期</label>
+                        <input type="date" id="editCapitalFlowDate">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="hideEditForm()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="data-entry-v2.js?v=5"></script>
 </body>
 </html>
