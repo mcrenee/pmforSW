@@ -3,11 +3,12 @@ let allRecords = [];
 let filteredRecords = [];
 
 // RBO投资总额配置（实际投资数据 - 税费前）
+// 显示顺序：浦东 -> 西安 -> 南京 -> 澳尔
 const RBO_INVESTMENTS = {
-    'RT-CN3101-SHWS0001-I': { name: '浦东机场（DRC）', investment: 2900000 },
-    'RT-CN0100-PAWSV0001': { name: '南京机场', investment: 2650000 },
-    'OT-CN0100-PAWSV0002': { name: '西安机场', investment: 1700000 },
-    'SV-CN0100-AURABJYX0001': { name: '澳尔医院', investment: 1980000 }
+    'RT-CN3101-SHWS0001-I': { name: '浦东机场（DRC）', investment: 2900000, order: 1 },
+    'OT-CN0100-PAWSV0002': { name: '西安机场', investment: 1700000, order: 2 },
+    'RT-CN0100-PAWSV0001': { name: '南京机场', investment: 2650000, order: 3 },
+    'SV-CN0100-AURABJYX0001': { name: '澳尔医院', investment: 1980000, order: 4 }
 };
 
 // 加载数据
@@ -51,11 +52,18 @@ function updateRBOStats() {
         rboStats[code].count++;
     });
     
-    // 渲染RBO统计卡片
+    // 渲染RBO统计卡片（按order排序）
     const container = document.getElementById('rboStats');
     container.innerHTML = '';
     
-    Object.entries(rboStats).forEach(([code, stats]) => {
+    // 按order排序
+    const sortedEntries = Object.entries(rboStats).sort((a, b) => {
+        const orderA = RBO_INVESTMENTS[a[0]]?.order || 999;
+        const orderB = RBO_INVESTMENTS[b[0]]?.order || 999;
+        return orderA - orderB;
+    });
+    
+    sortedEntries.forEach(([code, stats]) => {
         const remaining = stats.investment - stats.paid;
         const percentage = stats.investment > 0 ? ((stats.paid / stats.investment) * 100).toFixed(1) : 0;
         
