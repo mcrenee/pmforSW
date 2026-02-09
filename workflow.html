@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工作流程图 | 肆瓦项目管理器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
+            background: #f5f7fa;
+            color: #2d3748;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 16px;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 24px auto;
+            padding: 0 24px;
+        }
+
+        .workflow-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 20px 32px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .project-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .project-tab {
+            padding: 10px 20px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            color: #4a5568;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .project-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .project-tab:hover:not(.active) {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .workflow-content {
+            padding: 32px;
+        }
+
+        .project-flow {
+            display: none;
+        }
+
+        .project-flow.active {
+            display: block;
+        }
+
+        .flow-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .time-node {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px 24px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            min-width: 200px;
+        }
+
+        .arrow {
+            font-size: 32px;
+            color: #cbd5e0;
+            align-self: center;
+        }
+
+        .parallel-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            flex: 1;
+        }
+
+        .flow-step {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .role-siwa {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .role-mc {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .step-section {
+            margin-bottom: 16px;
+        }
+
+        .step-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .step-content {
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.6;
+            padding-left: 20px;
+        }
+
+        .email-template {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 12px 16px;
+            margin-top: 8px;
+            font-size: 13px;
+            border-radius: 4px;
+        }
+
+        .email-field {
+            margin: 6px 0;
+            color: #4a5568;
+        }
+
+        .email-field strong {
+            color: #2d3748;
+            min-width: 80px;
+            display: inline-block;
+        }
+
+        .special-rule {
+            background: #fff5e6;
+            border-left: 4px solid #ffa500;
+            padding: 12px 16px;
+            margin-top: 8px;
+            font-size: 13px;
+            border-radius: 4px;
+        }
+
+        .special-rule-title {
+            font-weight: 700;
+            color: #cc6600;
+            margin-bottom: 8px;
+        }
+
+        .stage-separator {
+            text-align: center;
+            padding: 30px 0;
+            margin: 30px 0;
+        }
+
+        .stage-label {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 24px;
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-title">
+            <i class="fas fa-sitemap"></i>
+            工作流程图
+        </div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link"><i class="fas fa-home"></i> 首页</a>
+            <a href="data-entry.html" class="nav-link"><i class="fas fa-database"></i> 数据登记</a>
+        </div>
+    </div>
+
+    <!-- Workflow Content -->
+    <div class="container">
+        <div class="workflow-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-project-diagram"></i>
+                    RBO 项目工作流程
+                </div>
+                <div class="project-tabs">
+                    <button class="project-tab active" data-project="pudong">浦东DRC项目</button>
+                    <button class="project-tab" data-project="xian-nanjing">西安/南京RBO项目</button>
+                </div>
+            </div>
+
+            <div class="workflow-content">
+                <!-- Pudong DRC Flow -->
+                <div id="pudong-flow" class="project-flow active">
+                    <div class="flow-container">
+                        <!-- Time Node -->
+                        <div class="time-node">
+                            <i class="fas fa-calendar-alt"></i><br>
+                            每月1号或15号<br>
+                            <div style="font-size: 12px; font-weight: normal; margin-top: 8px;">每月报数日（二选一）</div>
+                        </div>
+
+                        <div class="arrow">→</div>
+
+                        <!-- Parallel Execution -->
+                        <div class="parallel-container">
+                            <!-- Siwa Task -->
+                            <div class="flow-step">
+                                <span class="role-badge role-siwa">👤 肆瓦</span>
+                                
+                                <div class="step-header">
+                                    <i class="fas fa-envelope"></i>
+                                    <span class="step-title">邮件报数</span>
+                                </div>
+
+                                <div class="step-section">
+                                    <div class="step-label">
+                                        <i class="fas fa-tasks"></i>
+                                        任务内容
+                                    </div>
+                                    <div class="step-content">
+                                        向MC团队发送收入数据报数邮件
+                                    </div>
+                                </div>
+
+                                <div class="step-section">
+                                    <div class="step-label">
+                                        <i class="fas fa-envelope-open-text"></i>
+                                        邮件模板
+                                    </div>
+                                    <div class="email-template">
+                                        <div class="email-field"><strong>发件人：</strong>上海肆瓦发起人邮箱</div>
+                                        <div class="email-field"><strong>收件人：</strong>arm@mcex.mo; accounting_service@mcex.mo</div>
+                                        <div class="email-field"><strong>抄送：</strong>zhangyi@microconnect.com; reneexu@microconnect.com; peilan@liantu.com.cn</div>
+                                        <div class="email-field" style="margin-top: 12px;"><strong>邮件正文：</strong></div>
+                                        <div style="padding-left: 16px; color: #4a5568; line-height: 1.8;">
+RBO编码：【  】<br>
+营业数据周期：【2026年1月15日 - 2026年1月31日】<br>
+企业实收金额汇总：【  】元人民币<br>
+请按照RBC约定分成比例，复核确认实收金额与付款金额，谢谢。
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- MC Task -->
+                            <div class="flow-step">
+                                <span class="role-badge role-mc">👤 MC</span>
+                                
+                                <div class="step-header">
+                                    <i class="fas fa-upload"></i>
+                                    <span class="step-title">运营平台上传Excel</span>
+                                </div>
+
+                                <div class="step-section">
+                                    <div class="step-label">
+                                        <i class="fas fa-tasks"></i>
+                                        任务内容
+                                    </div>
+                                    <div class="step-content">
+                                        在MC运营平台上传Excel报数
+                                    </div>
+                                </div>
+
+                                <div class="step-section">
+                                    <div class="step-label">
+                                        <i class="fas fa-link"></i>
+                                        平台链接
+                                    </div>
+                                    <div class="step-content">
+                                        <a href="https://mcisaas.mcc-cido/revenue-upload#/hand-upload" target="_blank" style="color: #667eea;">https://mcisaas.mcc-cido/revenue-upload#/hand-upload</a>
+                                    </div>
+                                </div>
+
+                                <div class="step-section">
+                                    <div class="step-label">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        扣款规则
+                                    </div>
+                                    <div class="special-rule">
+                                        <div class="special-rule-title">
+                                            <i class="fas fa-clock"></i>
+                                            重要时间节点
+                                        </div>
+                                        <div style="color: #4a5568; line-height: 1.8;">
+                                            • 12:00前上传 → 当日18:00扣款<br>
+                                            • 12:00后上传 → 次日扣款
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Xian/Nanjing RBO Flow -->
+                <div id="xian-nanjing-flow" class="project-flow">
+                    <h3 style="margin-bottom: 24px; color: #2d3748;">
+                        <i class="fas fa-info-circle"></i> 两阶段串行流程
+                    </h3>
+
+                    <!-- Stage 1 -->
+                    <div style="margin-bottom: 40px;">
+                        <div class="stage-separator">
+                            <div class="stage-label">
+                                <i class="fas fa-star"></i> 第一阶段：信息流报数
+                            </div>
+                        </div>
+
+                        <div class="flow-container">
+                            <div class="time-node">
+                                <i class="fas fa-calendar-alt"></i><br>
+                                每月1号 / 15号
+                            </div>
+
+                            <div class="arrow">→</div>
+
+                            <div class="parallel-container">
+                                <!-- Siwa Task -->
+                                <div class="flow-step">
+                                    <span class="role-badge role-siwa">👤 肆瓦</span>
+                                    
+                                    <div class="step-header">
+                                        <i class="fas fa-envelope"></i>
+                                        <span class="step-title">邮件报数</span>
+                                    </div>
+
+                                    <div class="step-section">
+                                        <div class="step-label">
+                                            <i class="fas fa-envelope-open-text"></i>
+                                            邮件模板
+                                        </div>
+                                        <div class="email-template">
+                                            <div class="email-field"><strong>发件人：</strong>上海肆瓦发起人邮箱</div>
+                                            <div class="email-field"><strong>收件人：</strong>arm@mcex.mo; accounting_service@mcex.mo</div>
+                                            <div class="email-field"><strong>抄送：</strong>zhangyi@microconnect.com; reneexu@microconnect.com; peilan@liantu.com.cn</div>
+                                            <div class="email-field" style="margin-top: 12px;"><strong>邮件正文：</strong></div>
+                                            <div style="padding-left: 16px; color: #4a5568; line-height: 1.8;">
+标题：【  】RBO项目报数<br>
+RBO编码：【  】<br>
+营业数据周期：【2026年1月15日 - 2026年1月31日】<br>
+企业实收金额汇总：【  】元人民币
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- MC Task -->
+                                <div class="flow-step">
+                                    <span class="role-badge role-mc">👤 MC</span>
+                                    
+                                    <div class="step-header">
+                                        <i class="fas fa-file-upload"></i>
+                                        <span class="step-title">OA系统提报</span>
+                                    </div>
+
+                                    <div class="step-section">
+                                        <div class="step-label">
+                                            <i class="fas fa-tasks"></i>
+                                            任务内容
+                                        </div>
+                                        <div class="step-content">
+                                            在OA系统中提交报数相关证明材料
+                                        </div>
+                                    </div>
+
+                                    <div class="step-section">
+                                        <div class="step-label">
+                                            <i class="fas fa-file-alt"></i>
+                                            交付物
+                                        </div>
+                                        <div class="step-content">
+                                            OA系统中上传「报数邮件截图」<br>
+                                            <span style="color: #e53e3e;">（截图必须包含完整的报数数据）</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stage 2 -->
+                    <div>
+                        <div class="stage-separator">
+                            <div class="stage-label">
+                                <i class="fas fa-star"></i> 第二阶段：资金流打款
+                            </div>
+                        </div>
+
+                        <div class="flow-container">
+                            <div class="time-node">
+                                <i class="fas fa-calendar-alt"></i><br>
+                                每月2号 / 16号
+                            </div>
+
+                            <div class="arrow">→</div>
+
+                            <div class="parallel-container">
+                                <!-- Siwa Task -->
+                                <div class="flow-step">
+                                    <span class="role-badge role-siwa">👤 肆瓦</span>
+                                    
+                                    <div class="step-header">
+                                        <i class="fas fa-money-check-alt"></i>
+                                        <span class="step-title">打款凭证邮件</span>
+                                    </div>
+
+                                    <div class="step-section">
+                                        <div class="step-label">
+                                            <i class="fas fa-envelope-open-text"></i>
+                                            邮件模板
+                                        </div>
+                                        <div class="email-template">
+                                            <div class="email-field"><strong>发件人：</strong>上海肆瓦发起人邮箱</div>
+                                            <div class="email-field"><strong>收件人：</strong>arm@mcex.mo; accounting_service@mcex.mo</div>
+                                            <div class="email-field"><strong>抄送：</strong>zhangyi@microconnect.com; reneexu@microconnect.com; peilan@liantu.com.cn</div>
+                                            <div class="email-field" style="margin-top: 12px;"><strong>邮件正文：</strong></div>
+                                            <div style="padding-left: 16px; color: #4a5568; line-height: 1.8;">
+标题：【  】RBO项目打款凭证<br>
+RBO编码：【  】<br>
+营业数据周期：【2026年1月15日 - 2026年1月29日】<br>
+企业分成金额：【  】元人民币<br>
+我们已将上述金额打款至指定账户，打款记录及凭证请见附件。
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="step-section">
+                                        <div class="step-label">
+                                            <i class="fas fa-paperclip"></i>
+                                            附件
+                                        </div>
+                                        <div class="step-content">
+                                            打款凭证文件
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- MC Task -->
+                                <div class="flow-step">
+                                    <span class="role-badge role-mc">👤 MC</span>
+                                    
+                                    <div class="step-header">
+                                        <i class="fas fa-file-invoice-dollar"></i>
+                                        <span class="step-title">OA系统提报（打款）</span>
+                                    </div>
+
+                                    <div class="step-section">
+                                        <div class="step-label">
+                                            <i class="fas fa-tasks"></i>
+                                            任务内容
+                                        </div>
+                                        <div class="step-content">
+                                            在OA系统提交打款材料
+                                        </div>
+                                    </div>
+
+                                    <div class="step-section">
+                                        <div class="step-label">
+                                            <i class="fas fa-file-alt"></i>
+                                            交付物
+                                        </div>
+                                        <div class="step-content">
+                                            OA系统中上传两类文件：<br>
+                                            1) 打款邮件（肆瓦发送的原版邮件）<br>
+                                            2) 打款凭证文件（肆瓦邮件附件中的凭证）
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Project tab switching
+        document.querySelectorAll('.project-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                document.querySelectorAll('.project-tab').forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Hide all flows
+                document.querySelectorAll('.project-flow').forEach(f => f.classList.remove('active'));
+                // Show selected flow
+                const projectId = this.getAttribute('data-project');
+                document.getElementById(projectId + '-flow').classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
