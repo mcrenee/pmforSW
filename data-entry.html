@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据登记系统 | 肆瓦项目管理器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #2d3748; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .header-title { display: flex; align-items: center; gap: 12px; font-size: 24px; font-weight: 700; }
+        .nav-links { display: flex; gap: 16px; }
+        .nav-link { color: white; text-decoration: none; padding: 8px 16px; border-radius: 6px; transition: all 0.2s; }
+        .nav-link:hover { background: rgba(255,255,255,0.2); }
+        .container { max-width: 1800px; margin: 24px auto; padding: 0 24px; }
+        .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 24px; }
+        .stat-card { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .stat-card h3 { font-size: 14px; color: #718096; margin-bottom: 12px; }
+        .stat-card .stat-value { font-size: 32px; font-weight: 700; color: #2d3748; }
+        .stat-card .stat-detail { font-size: 13px; color: #a0aec0; margin-top: 8px; }
+        .rbo-investment { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 24px; }
+        .rbo-investment h2 { font-size: 20px; margin-bottom: 16px; }
+        .rbo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+        .rbo-card { background: rgba(255,255,255,0.15); padding: 16px; border-radius: 8px; backdrop-filter: blur(10px); }
+        .rbo-card h4 { font-size: 14px; margin-bottom: 12px; opacity: 0.9; }
+        .rbo-amount { font-size: 24px; font-weight: 700; margin: 4px 0; }
+        .rbo-progress { background: rgba(255,255,255,0.2); height: 6px; border-radius: 3px; margin-top: 8px; overflow: hidden; }
+        .rbo-progress-fill { background: white; height: 100%; transition: width 0.3s; }
+        .data-section { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; }
+        .section-header { padding: 20px 24px; background: #f8f9fa; border-bottom: 2px solid #e9ecef; display: flex; justify-content: space-between; align-items: center; }
+        .controls { padding: 20px 24px; background: #f8f9fa; border-bottom: 1px solid #e9ecef; display: flex; gap: 12px; flex-wrap: wrap; }
+        .search-box { flex: 1; min-width: 250px; }
+        .search-box input { width: 100%; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; }
+        .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
+        .btn-secondary { background: #e2e8f0; color: #4a5568; }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
+        th { background: #f7fafc; font-weight: 600; color: #2d3748; position: sticky; top: 0; }
+        tr:hover { background: #f7fafc; }
+        .status-badge { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .status-completed { background: #c6f6d5; color: #22543d; }
+        .status-processing { background: #feebc8; color: #7c2d12; }
+        .status-pending { background: #e2e8f0; color: #2d3748; }
+        .edit-btn { color: #667eea; cursor: pointer; }
+        .edit-btn:hover { color: #764ba2; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-title"><i class="fas fa-database"></i> 数据登记系统</div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link"><i class="fas fa-home"></i> 首页</a>
+            <a href="workflow.html" class="nav-link"><i class="fas fa-sitemap"></i> 工作流程图</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- RBO投资统计 -->
+        <div class="rbo-investment">
+            <h2><i class="fas fa-chart-line"></i> RBO项目投资统计</h2>
+            <div class="rbo-grid" id="rboStats"></div>
+        </div>
+
+        <!-- 汇总统计 -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <h3>总记录数</h3>
+                <div class="stat-value" id="totalRecords">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>已完成</h3>
+                <div class="stat-value" id="completedRecords">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>处理中</h3>
+                <div class="stat-value" id="processingRecords">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>累计打款金额</h3>
+                <div class="stat-value" id="totalPaid">¥0</div>
+            </div>
+        </div>
+
+        <!-- 数据表格 -->
+        <div class="data-section">
+            <div class="section-header">
+                <h2><i class="fas fa-table"></i> 数据记录</h2>
+                <button class="btn btn-primary" onclick="exportToExcel()"><i class="fas fa-download"></i> 导出Excel</button>
+            </div>
+
+            <div class="controls">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="搜索 RBO编码、简称..." oninput="filterRecords()">
+                </div>
+                <select id="statusFilter" onchange="filterRecords()" class="btn btn-secondary">
+                    <option value="">全部状态</option>
+                    <option value="已完成">已完成</option>
+                    <option value="处理中">处理中</option>
+                    <option value="待处理">待处理</option>
+                </select>
+                <select id="systemFilter" onchange="filterRecords()" class="btn btn-secondary">
+                    <option value="">全部系统</option>
+                    <option value="二合一">二合一</option>
+                    <option value="全流程">全流程</option>
+                </select>
+            </div>
+
+            <div class="table-container">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>处理日期</th>
+                            <th>状态</th>
+                            <th>系统</th>
+                            <th>RBO编码</th>
+                            <th>内部RBO编码</th>
+                            <th>简称</th>
+                            <th>交易账号</th>
+                            <th>周期开始</th>
+                            <th>周期结束</th>
+                            <th>信息流OA</th>
+                            <th>信息流日期</th>
+                            <th>应打款</th>
+                            <th>实际打款</th>
+                            <th>资金流OA</th>
+                            <th>资金流日期</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="data-entry.js"></script>
+</body>
+</html>
